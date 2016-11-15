@@ -1,0 +1,3 @@
+- xapi get/statements: paging
+- promise supprt
+- benchmark option

@@ -1,0 +1,25 @@
+{
+  "name": "lx-request",
+  "description": "Transparent and dependency free requests via `xhr` (browser) or `http` (node).",
+  "homepage": "",
+  "private": true,
+  "author": "@RoboSparrow (jboeselt)",
+  "version": "0.0.1",
+  "dependencies": {},
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "grunt": "^1.0.1",
+    "grunt-contrib-watch": "^1.0.0",
+    "grunt-eslint": "^19.0.0",
+    "mocha": "^3.1.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "main": "req.xapi.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "license": ""
+}

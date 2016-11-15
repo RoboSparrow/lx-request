@@ -1,0 +1,4 @@
+node_modules/*
+config.lrs.json
+config.lrs.js
+_dev/*

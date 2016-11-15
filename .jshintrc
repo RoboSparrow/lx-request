@@ -1,0 +1,16 @@
+{
+    "curly": true,
+    "funcscope": true,
+    "undef": true,
+    "unused": true,
+    "jquery": false,
+    "node": true,
+    "globals": {
+        "console": true,
+        "module": true,
+        "document": true,
+        "window": true,
+        "chai": true,
+        "assert": true
+    }
+}
