@@ -138,6 +138,16 @@ if ((typeof module !== 'undefined' && module.exports)) {
         });
     };
 
+    // get headers
+    req.xapi.getHeaders = function() {
+        return defaults().headers;
+    };
+
+    // get headers
+    req.xapi.getEndpoint = function(api) {
+        return endpoint(api);
+    };
+
     ////
     // vars
     ////
