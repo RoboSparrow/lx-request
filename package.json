@@ -7,7 +7,6 @@
   "version": "0.0.1",
   "dependencies": {},
   "devDependencies": {
-    "chai": "^3.5.0",
     "grunt": "^1.0.1",
     "grunt-contrib-watch": "^1.0.0",
     "grunt-eslint": "^19.0.0",

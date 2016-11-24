@@ -119,6 +119,6 @@
     "space-unary-ops": ["error", { "words": true, "nonwords": false }],
     "unicode-bom": ["error", "never"],
     // custom
-    "indent": ["error", 4]
+    "indent": ["error", 4, { "SwitchCase": 1 }]
   }
 }
