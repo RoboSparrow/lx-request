@@ -194,8 +194,9 @@ var req = (function() {
         var data = '';
 
         var options = {
-            host: _url.host,
+            host: (_url.port) ? _url.host.replace(':' + _url.port, '') : _url.host,
             path: _url.path,
+            port: _url.port,
             query: _url.query + _encode2Query(config.query),
             method: config.method,
             headers: config.headers,
@@ -245,6 +246,7 @@ var req = (function() {
         request.on('error', function(error) {
             result.error = error;
             config.error(result, request);
+            config.always(result, error);
         });
 
         request.end();
@@ -258,16 +260,17 @@ var req = (function() {
 
     var request = function(url, config) {
 
+        // 'raw' in comments below: xhr or http.ClientRequest
         var defaults = {
             method: 'GET',
             query: {},
             headers: {},
             data: null,
             responseType: '',//?TODO
-            transformResponse: false, // function(res)
-            success: function() {},  //(data, res)
-            error: function() {},    //(error, res)
-            always: function() {}   //(statusCode, res)
+            transformResponse: false,   // function(raw)
+            success: function() {},     // (Response, raw)
+            error: function() {},       // (Response, raw)
+            always: function() {}       // (Response, raw)
         };
 
         // merge config with defaults
@@ -283,27 +286,9 @@ var req = (function() {
             }
         }
 
-        // query todo NICER!
-        var query = [];
-        for (var prop in config.query) {
-
-            if (config.query.hasOwnProperty(prop)) {
-                var value;
-                var type = Object.prototype.toString.call(config.query[prop]);
-                switch (type) {
-                case '[object Array]':
-                case '[object Object]':
-                    value = encodeURIComponent(JSON.stringify(config.query[prop]));
-                    break;
-                default:
-                    value = encodeURIComponent(config.query[prop]);
-                }
-                query.push(encodeURIComponent(prop) + '=' + value);
-            }
-        }
-
-        if (query.length) {
-            url = url + '?' + query.join('&');
+        var query = _encode2Query(config.query);
+        if (query) {
+            url = url + '?' + query;
         }
 
         // invoke request
