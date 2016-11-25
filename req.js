@@ -27,19 +27,6 @@ var req = (function() {
     }
 
     ////
-    //
-    ////
-
-    // https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/send
-    // void send();
-    // void send(ArrayBuffer data);
-    // void send(ArrayBufferView data);
-    // void send(Blob data);
-    // void send(Document data);
-    // void send(DOMString? data);
-    // void send(FormData data);
-
-    ////
     // Utils
     ////
 
@@ -79,12 +66,12 @@ var req = (function() {
     var sendableRawDataFormats = [];
     if (!NODE) {
         sendableRawDataFormats = [
-            //https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/send
+            // https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/send
             '[object Blob]',
             '[object FormData]',
             '[object String]', //DOMString === string
             '[object HTMLDocument]',
-            //https://developer.mozilla.sorg/en-US/docs/Web/API/ArrayBufferView
+            // https://developer.mozilla.sorg/en-US/docs/Web/API/ArrayBufferView
             '[object ArrayBuffer]',
             '[object DataView]',
             '[object Int8Array]',
@@ -99,7 +86,7 @@ var req = (function() {
         ];
     } else {
         // https://nodejs.org/api/http.html#http_request_write_chunk_encoding_callback
-        //https://nodejs.org/api/buffer.html
+        // https://nodejs.org/api/buffer.html
         sendableRawDataFormats = [
             '[object String]',
             '[object Uint8Array]'
