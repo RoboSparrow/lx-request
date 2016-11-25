@@ -27,6 +27,19 @@ var req = (function() {
     }
 
     ////
+    //
+    ////
+
+    // https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/send
+    // void send();
+    // void send(ArrayBuffer data);
+    // void send(ArrayBufferView data);
+    // void send(Blob data);
+    // void send(Document data);
+    // void send(DOMString? data);
+    // void send(FormData data);
+
+    ////
     // Utils
     ////
 
@@ -62,6 +75,55 @@ var req = (function() {
         return body;
     };
 
+    //// parse urelencoded request body
+    var sendableRawDataFormats = [];
+    if (!NODE) {
+        sendableRawDataFormats = [
+            //https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/send
+            '[object Blob]',
+            '[object FormData]',
+            '[object String]', //DOMString === string
+            '[object HTMLDocument]',
+            //https://developer.mozilla.sorg/en-US/docs/Web/API/ArrayBufferView
+            '[object ArrayBuffer]',
+            '[object DataView]',
+            '[object Int8Array]',
+            '[object Uint8Array]',
+            '[object Uint8ClampedArray]',
+            '[object Int16Array]',
+            '[object Uint16Array]',
+            '[object Int32Array]',
+            '[object Uint32Array]',
+            '[object Float32Array]',
+            '[object Float64Array]'
+        ];
+    } else {
+        // https://nodejs.org/api/http.html#http_request_write_chunk_encoding_callback
+        //https://nodejs.org/api/buffer.html
+        sendableRawDataFormats = [
+            '[object String]',
+            '[object Uint8Array]'
+        ];
+    }
+
+    var _parseRawRequestBody = function(data) {
+        // string: we assume it was uri-encoded already
+        if (typeof data  === 'string') {
+            return data;
+        }
+        // other primitives
+        if (typeof data  !== 'object') {
+            return encodeURIComponent(data);
+        }
+        //
+        var _type = Object.prototype.toString.call(data);
+        if (sendableRawDataFormats.indexOf(_type) > -1) {
+            return data;
+        }
+
+        return _encode2Query(data);
+    };
+
     //// parse JSON
     var _parseResponseBody = function(body, config) {
 
@@ -82,6 +144,14 @@ var req = (function() {
 
     //// encode a javascript object into a query string
     var _encode2Query = function(obj, prefix) {
+
+        if (Object.prototype.toString.call(obj) === '[object Array]') {
+            obj = obj.reduce(function(o, v, i) {
+                o[i] = v;
+                return o;
+            }, {});
+        }
+
         var str = [];
         for (var p in obj) {
             if (obj.hasOwnProperty(p)) {
@@ -168,7 +238,7 @@ var req = (function() {
                 } else {
                     config.error(result, xhr);
                 }
-                config.always(result, xhr);
+                config.always(result, xhr, config);
             }
         };
 
@@ -234,7 +304,7 @@ var req = (function() {
                 } else {
                     config.error(result, res);
                 }
-                config.always(result, res);
+                config.always(result, res, config);
             });
 
         });
@@ -246,7 +316,7 @@ var req = (function() {
         request.on('error', function(error) {
             result.error = error;
             config.error(result, request);
-            config.always(result, error);
+            config.always(result, error, config);
         });
 
         request.end();
@@ -270,7 +340,7 @@ var req = (function() {
             transformResponse: false,   // function(raw)
             success: function() {},     // (Response, raw)
             error: function() {},       // (Response, raw)
-            always: function() {}       // (Response, raw)
+            always: function() {}       // (Response, raw, config)
         };
 
         // merge config with defaults
@@ -282,7 +352,7 @@ var req = (function() {
                 config.data = JSON.stringify(config.data);
             } else {
                 //? header
-                config.data = _encode2Query(config.data);
+                config.data =  _parseRawRequestBody(config.data);
             }
         }
 

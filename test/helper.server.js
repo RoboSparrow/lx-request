@@ -2,55 +2,70 @@
 
 const http = require('http');
 const path = require('path');
+const Url = require('url');
 // let fs = require('fs');
 
 const server = (() => {
     return http.createServer(function(request, response) {
 
-        // curr not used, but later we may load files
-        let filePath = '.' + request.url;
-        if (filePath === './') {
-            filePath = './index.html';
-        }
+        let url = Url.parse(request.url);
+        let extname = path.extname(url.pathname).toLowerCase();
+        let name = path.basename(url.pathname, extname);
 
-        let extname = String(path.extname(filePath)).toLowerCase();
-        let name = path.basename(filePath, extname);
-
-        let contentType = 'text/html';
         let mimeTypes = {
             '.html': 'text/html',
             '.json': 'application/json'
         };
 
-        contentType = mimeTypes[extname] || 'application/octect-stream';
-        let body = [];
-        request
-        .on('error', (err) => {
-            response.writeHead(500);
-            response.end(`Sorry, check with the site admin for error: [500] ${err.message} ..\n`);
-            response.end();
-        })
-        .on('data', (chunk) => {
-            body.push(chunk);
-        })
-        .on('end', () => {
-            let content = Buffer.concat(body).toString();
+        let contentType = mimeTypes[extname] || 'text/plain';
+        let body = '';
 
+        response.setHeader('Content-Type', contentType);
+        // include some request data into response
+        response.setHeader('x-req-content-type', request.headers['Content-Type'] || '');
+        response.setHeader('x-req-search', url.search);
+        response.setHeader('x-req-method', request.method);
+        response.setHeader('x-req-method', request.method);
+        response.setHeader('x-req-content-length', request.headers['Content-Length'] || '');
+
+        request.on('error', (err) => {
+            response.writeHead(500);
+            response.end(`Sorry, error: [500] ${err.message} ..\n`);
+            response.end();
+        });
+
+        request.on('data', (chunk) => {
+            switch (request.method) {
+                case 'POST':
+                case 'PUT':
+                case 'PATCH':
+                    body += chunk.toString();
+                    break;
+            }
+        });
+
+        request.on('end', () => {
             switch (name) {
                 case '404':
-                    response.writeHead(404, { 'Content-Type': contentType });
-                    response.end(content, 'utf-8');
+                    response.statusCode = 404;
+                    response.end(body, 'utf-8');
                     break;
-
                 case '200':
-                    response.writeHead(200, { 'Content-Type': contentType });
-                    response.end(content, 'utf-8');
+                    response.statusCode = 200;
+                    response.end(body, 'utf-8');
                     break;
-
+                case '204':
+                    response.statusCode = 204;
+                    response.end('', 'utf-8');
+                    break;
+                case '400':
+                    response.statusCode = 400;
+                    response.end('body', 'utf-8');
+                    break;
                 default:
-                    response.writeHead(500);
-                    response.end('Sorry, check with the site admin for error: 500 ..\n');
-                    response.end();
+                    response.statusCode = 500;
+                    response.end('Sorry, error: 500 ..\n');
+                    response.end('body', 'utf-8');
             }
 
         });
