@@ -25,7 +25,6 @@ const server = (() => {
         response.setHeader('x-req-content-type', request.headers['Content-Type'] || '');
         response.setHeader('x-req-search', url.search);
         response.setHeader('x-req-method', request.method);
-        response.setHeader('x-req-method', request.method);
         response.setHeader('x-req-content-length', request.headers['Content-Length'] || '');
 
         request.on('error', (err) => {

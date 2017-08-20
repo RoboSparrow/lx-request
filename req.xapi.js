@@ -12,6 +12,46 @@ if ((typeof module !== 'undefined' && module.exports)) {
 
     'use strict';
 
+    var search = function(api, config, nextFn, dataFn) {
+
+        var response = null;
+        var prev = null;
+        var next = null;
+
+        var resolve = config.success || function() {};
+
+        var aggregate = function(res) {
+            if (!response) {
+                response = res;
+                return;
+            }
+            var oldData = dataFn(response);
+            var newData = dataFn(res);
+            for (var i = 0; i < newData.length; i++) {
+                oldData.push(newData[i]);
+            }
+        };
+
+        var success = function(res, ins) {
+            next = nextFn(res);
+            next = next.replace(/^\/xapi/i, ''); // ADL more
+            aggregate(res);
+            if (!next || next === prev) {
+                // replace data with aggregated data in current response
+                res.data = response.data;
+                resolve(res, ins);
+                return;
+            }
+            prev = next;
+
+            req.xapi.get(next, config);
+        };
+
+        config.success = success;
+        req.xapi.get(api, config);
+
+    };
+
     /**
      * @see https://github.com/adlnet/xAPI-Spec/blob/master/xAPI.md#cors
      * @see https://blogs.msdn.microsoft.com/ieinternals/2010/05/13/xdomainrequest-restrictions-limitations-and-workarounds/
@@ -125,6 +165,17 @@ if ((typeof module !== 'undefined' && module.exports)) {
         return req.xapi(api, config);
     };
 
+    req.xapi.statements = function(config) {
+        return search('/statements', config,
+            function(res) {
+                return res.data.more;
+            },
+            function(res) {
+                return res.data.statements;
+            }
+        );
+    };
+
     ////
     // helper methods
     ////
@@ -136,6 +187,11 @@ if ((typeof module !== 'undefined' && module.exports)) {
             var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
             return v.toString(16);
         });
+    };
+
+    req.xapi.toBase64 = function(str) {
+        // eslint-disable-next-line no-undef
+        return (typeof btoa === 'function') ? btoa(str) : new Buffer(str).toString('base64');
     };
 
     // get headers
