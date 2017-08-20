@@ -20,12 +20,12 @@ const server = (() => {
         let contentType = mimeTypes[extname] || 'text/plain';
         let body = '';
 
-        response.setHeader('Content-Type', contentType);
+        response.setHeader('content-type', contentType);
         // include some request data into response
-        response.setHeader('x-req-content-type', request.headers['Content-Type'] || '');
+        response.setHeader('x-req-content-type', request.headers['content-type'] || '');
         response.setHeader('x-req-search', url.search);
         response.setHeader('x-req-method', request.method);
-        response.setHeader('x-req-content-length', request.headers['Content-Length'] || '');
+        response.setHeader('x-req-content-length', request.headers['content-length'] || '');
 
         request.on('error', (err) => {
             response.writeHead(500);

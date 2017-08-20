@@ -58,7 +58,7 @@ describe('Basic connectivity', function() {
 
 });
 
-describe('req.xapi POST', function() {
+describe('req.xapi POST many statements', function() {
 
     let result;
     batchLength = 10;
@@ -73,7 +73,7 @@ describe('req.xapi POST', function() {
                 method: 'POST',
                 data: statements,
                 always: function(res, ins) {
-                    result = res
+                    result = res;
                     ////
                     // set statement ids
                     ////
@@ -93,7 +93,7 @@ describe('req.xapi POST', function() {
 
 });
 
-describe('req.xapi.statements', function() {
+describe('req.xapi.statements get many with limit', function() {
     // eslint-disable-next-line no-invalid-this
     this.timeout(0);
 
@@ -119,16 +119,15 @@ describe('req.xapi.statements', function() {
         );
     });
 
-    it('POST /statements: write ' + batchLength + ' statements to LRS', function(done) {
+    it('retrieved all ' + batchLength + ' stored statements from LRS', function(done) {
         assert.strictEqual(result.status, 200, 'response status: 200');
         assert.strictEqual(Object.prototype.toString.call(result.data.statements), '[object Array]', 'is an array');
         assert.strictEqual(result.data.statements.length, batchLength, 'has ' + batchLength + ' elements');
 
         const ids = result.data.statements.map((smt) => {
-            return smt.id
+            return smt.id;
         });
         assert.deepEqual(ids.reverse(), retrieved, 'statementIds are returned in reversed order');
-
         done();
     });
 
