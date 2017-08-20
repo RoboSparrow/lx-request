@@ -8,11 +8,11 @@ const req = require('../req.xapi');
 describe('request query parsing', function() {
 
     let url;
-    
+
     const actor = {
         mbox: 'mailto:test@test.test'
     };
-        
+
     before(function() {
         url = server.listen(8000);
     });
@@ -37,7 +37,7 @@ describe('request query parsing', function() {
             }
         });
     });
-    
+
     it('if request is `application/json` then complex GET params sholuld be parsed to json', function(done) {
 
         req.json(url + '/200', {
@@ -47,7 +47,7 @@ describe('request query parsing', function() {
             always: function(result, response) {
                 assert.strictEqual(result.status, 200);
                 assert.strictEqual(result.headers['x-req-content-type'], 'application/json');
-       
+
                 const search = result.headers['x-req-search'];
                 const expected = '?actor=' + JSON.stringigy(actor);
                 assert.strictEqual(decodeURIComponent(search), expected);
@@ -55,7 +55,7 @@ describe('request query parsing', function() {
             }
         });
     });
-    
+
     it('if request.xapi then complex GET params sholuld be parsed to json', function(done) {
         req.xapi(url + '/200', {
             query: {
@@ -64,7 +64,7 @@ describe('request query parsing', function() {
             always: function(result, response) {
                 assert.strictEqual(result.status, 200);
                 assert.strictEqual(result.headers['x-req-content-type'], 'application/json');
-                
+
                 const search = result.headers['x-req-search'];
                 const expected = '?actor=' + JSON.stringigy(actor);
                 assert.strictEqual(decodeURIComponent(search), expected);
