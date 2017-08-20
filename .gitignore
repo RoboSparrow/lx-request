@@ -1,4 +1,3 @@
 node_modules/*
-config.lrs.json
-config.lrs.js
+#test/config.lrs.js
 _dev/*

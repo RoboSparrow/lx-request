@@ -2,7 +2,7 @@
 
 const assert = require('chai').assert;
 const req = require('../../req.xapi');
-const config = require('../config.xapi');
+const config = require('../config.lrs');
 
 req.xapi.LRS = config.defaults.lrs;
 req.xapi.AUTH = 'Basic ' + req.xapi.toBase64(config.defaults.auth);

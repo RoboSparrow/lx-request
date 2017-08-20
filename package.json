@@ -19,6 +19,8 @@
   },
   "main": "req.xapi.js",
   "scripts": {
+    "dev": "./node_modules/.bin/grunt watch",
+    "lint": "./node_modules/.bin/eslint *.js test/**/*.js",
     "test": "./node_modules/.bin/mocha"
   },
   "license": ""
