@@ -1,3 +1,4 @@
 node_modules/*
-#test/config.lrs.js
+npm-debug.log
+test/config.lrs.js
 _dev/*
