@@ -4,6 +4,8 @@
 - promise supprt
 - benchmark option
 
+- documentation
+
 - xhr onerror > error
 - error catching json parse
 - if (xhr.status < 299 && !result.error)
