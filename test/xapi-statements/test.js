@@ -4,9 +4,9 @@ const assert = require('chai').assert;
 const req = require('../../req.xapi');
 const config = require('../config.lrs');
 
-req.xapi.LRS = config.defaults.lrs;
-req.xapi.AUTH = 'Basic ' + req.xapi.toBase64(config.defaults.auth);
-req.xapi.VERSION = config.defaults.version;
+req.xapi.LRS = config.lrs;
+req.xapi.AUTH = 'Basic ' + req.xapi.toBase64(config.auth);
+req.xapi.VERSION = config.version;
 
 const registration = req.xapi.uuid();
 let batchLength;
