@@ -34,7 +34,6 @@ if ((typeof module !== 'undefined' && module.exports)) {
 
         var success = function(res, ins) {
             next = nextFn(res);
-            next = next.replace(/^\/xapi/i, ''); // ADL more
             aggregate(res);
             if (!next || next === prev) {
                 // replace data with aggregated data in current response
@@ -168,7 +167,7 @@ if ((typeof module !== 'undefined' && module.exports)) {
     req.xapi.statements = function(config) {
         return search('/statements', config,
             function(res) {
-                return res.data.more;
+                return res.data.more.replace(/^\/xapi/i, ''); // ADL more, TODO check learninglocker
             },
             function(res) {
                 return res.data.statements;

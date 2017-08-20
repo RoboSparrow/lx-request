@@ -1,4 +1,6 @@
-- xapi get/statements: paging
+- xapi /statements/more: learninglocker
+- testability/ more url: add run-time overwrite for config.lrs to config
+- handle redirects in xhr and http: redirects: https://www.mattlunn.me.uk/blog/2012/05/handling-a-http-redirect-in-node-js/
 - promise supprt
 - benchmark option
 
@@ -7,5 +9,3 @@
 - if (xhr.status < 299 && !result.error)
 
 - ES6 modules
-
-x data formats post/put

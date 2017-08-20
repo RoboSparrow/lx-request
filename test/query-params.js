@@ -9,7 +9,7 @@ describe('request query parsing', function() {
 
     let url;
 
-    const actor = {
+    const agent = {
         mbox: 'mailto:test@test.test'
     };
 
@@ -24,14 +24,14 @@ describe('request query parsing', function() {
     it('if request is not `application/json` then, complex GET params sholuld be parsed php-like', function(done) {
         req.request(url + '/200', {
             query: {
-                actor
+                agent
             },
             always: function(result, response) {
                 assert.strictEqual(result.status, 200);
                 assert.notEqual(result.headers['x-req-content-type'], 'application/json');// empty, in fact
 
                 const search = result.headers['x-req-search'];
-                const expected = '?actor[mbox]=mailto:test@test.test';
+                const expected = '?agent[mbox]=mailto:test@test.test';
                 assert.strictEqual(decodeURIComponent(search), expected);
                 done();
             }
@@ -42,14 +42,14 @@ describe('request query parsing', function() {
 
         req.json(url + '/200', {
             query: {
-                actor
+                agent
             },
             always: function(result, response) {
                 assert.strictEqual(result.status, 200);
                 assert.strictEqual(result.headers['x-req-content-type'], 'application/json');
 
                 const search = result.headers['x-req-search'];
-                const expected = '?actor=' + JSON.stringigy(actor);
+                const expected = '?agent=' + JSON.stringify(agent);
                 assert.strictEqual(decodeURIComponent(search), expected);
                 done();
             }
@@ -57,17 +57,13 @@ describe('request query parsing', function() {
     });
 
     it('if request.xapi then complex GET params sholuld be parsed to json', function(done) {
-        req.xapi(url + '/200', {
+        req.xapi('/statements', {
             query: {
-                actor
+                agent
             },
             always: function(result, response) {
                 assert.strictEqual(result.status, 200);
-                assert.strictEqual(result.headers['x-req-content-type'], 'application/json');
-
-                const search = result.headers['x-req-search'];
-                const expected = '?actor=' + JSON.stringigy(actor);
-                assert.strictEqual(decodeURIComponent(search), expected);
+                assert.strictEqual(Object.prototype.toString.call(result.data.statements), '[object Array]', 'is an array');
                 done();
             }
         });

@@ -30,6 +30,30 @@ var req = (function() {
     // Utils
     ////
 
+    //// case-insensitive object access (headers!)
+    var objectGet = function(key, obj, ret) {
+        var search = key.toLowerCase();
+        var l;
+        for (var k in obj) {
+            if (obj.hasOwnkeyerty(k)) {
+                l = k.toLowerCase();
+                if (search === l) {
+                    return obj[k];
+                }
+            }
+        }
+        return (ret === undefined) ? null : ret;
+    };
+
+    //// check config if request is a json request
+    var _isJsonRequest = function(config) {
+        if (config.responseType === 'json') { // xhr
+            return true;
+        }
+        var header = objectGet('Content-Type', config.headers, '');
+        return /application\/json/.test(header);
+    };
+
     // Merges two (or more) objects,
     // @TODO improve
     var mergeHash = function(destination, source) {
@@ -47,19 +71,6 @@ var req = (function() {
             destination[property] = source[property];
         }
         return destination;
-    };
-
-    //// parse JSON
-    var _parseRequestBody = function(body, config) {
-        if (config.responseType === 'json') {
-            try {
-                return JSON.stringify(body);
-            } catch (e) {
-                //@TODO
-                console.error(e);
-            }
-        }
-        return body;
     };
 
     //// parse urelencoded request body
@@ -92,7 +103,21 @@ var req = (function() {
             '[object Uint8Array]'
         ];
     }
-
+    
+    //// parse JSON
+    var _parseRequestBody = function(config) {
+        if (_isJsonRequest(config)) {
+            try {
+                return JSON.stringify(config.data);
+            } catch (e) {
+                //@TODO
+                console.error(e);
+            }
+            return config.data;
+        }
+        return _parseRawRequestBody(config.data);
+    };
+    
     var _parseRawRequestBody = function(data) {
         // string: we assume it was uri-encoded already
         if (typeof data  === 'string') {
@@ -108,7 +133,7 @@ var req = (function() {
             return data;
         }
 
-        return _encode2Query(data);
+        return _encodeData(data);
     };
 
     //// parse JSON
@@ -123,6 +148,7 @@ var req = (function() {
                 return JSON.parse(body);
             } catch (e) {
                 //@TODO
+                console.log(body);
                 console.error(e);
             }
         }
@@ -130,8 +156,7 @@ var req = (function() {
     };
 
     //// encode a javascript object into a query string
-    var _encode2Query = function(obj, prefix) {
-
+    var _encodeData = function(obj, prefix) {
         if (Object.prototype.toString.call(obj) === '[object Array]') {
             obj = obj.reduce(function(o, v, i) {
                 o[i] = v;
@@ -143,7 +168,31 @@ var req = (function() {
         for (var p in obj) {
             if (obj.hasOwnProperty(p)) {
                 var k = prefix ? prefix + '[' + p + ']' : p, v = obj[p];
-                str.push(typeof v === 'object' ? _encode2Query(v, k) : encodeURIComponent(k) + '=' + encodeURIComponent(v));
+                str.push(typeof v === 'object' ? _encodeData(v, k) : encodeURIComponent(k) + '=' + encodeURIComponent(v));
+            }
+        }
+        return str.join('&');
+    };
+    
+    //// encode a javascript object into a query string
+    var _encodeQuery = function(config) {
+        var str = [];
+        var obj = config.query;
+        var val;
+        
+        if (!_isJsonRequest(config)) {
+            return _encodeData(obj);// if deep nested obj php-like query
+        }
+        
+        for (var key in obj) {
+            if (obj.hasOwnProperty(key)) {
+                //TODO redundant, but faster!
+                if (obj[key] === null || typeof obj[key] === 'string' || typeof obj[key] === 'number' || typeof obj[key] === 'boolean') {
+                    val = obj[key];
+                } else {
+                    val = JSON.stringify(obj[key]);
+                }
+                str.push(encodeURIComponent(key) + '=' + encodeURIComponent(val));
             }
         }
         return str.join('&');
@@ -236,7 +285,7 @@ var req = (function() {
 
         var data = null;
         if (config.data) {
-            data = _parseRequestBody(config.data, config);
+            data = _parseRequestBody(config);
         }
 
         xhr.send(data);
@@ -254,15 +303,15 @@ var req = (function() {
             host: (_url.port) ? _url.host.replace(':' + _url.port, '') : _url.host,
             path: _url.path,
             port: _url.port,
-            query: _url.query + _encode2Query(config.query),
+            query: _url.query,
             method: config.method,
             headers: config.headers,
             body: config.data
         };
 
         if (config.data) {
-            config.data = _parseRequestBody(config.data, config);
-            options.headers['Content-Length'] = Buffer.byteLength(config.data);
+            config.data = _parseRequestBody(config);
+            options.headers['content-length'] = Buffer.byteLength(config.data);
         }
 
         var result = new Response();
@@ -333,17 +382,8 @@ var req = (function() {
         // merge config with defaults
         config = mergeHash(defaults, config);
 
-        // data
-        if (config.responseType !== 'json' && config.data) {
-            if (/application\/json/.test(config.headers['Content-Type'])) {
-                config.data = JSON.stringify(config.data);
-            } else {
-                //? header
-                config.data =  _parseRawRequestBody(config.data);
-            }
-        }
-
-        var query = _encode2Query(config.query);
+        // encode query params
+        var query = _encodeQuery(config);
         if (query) {
             url = url + '?' + query;
         }
