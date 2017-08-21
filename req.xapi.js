@@ -1,7 +1,6 @@
 /**
  * @author jboeselt
  * simple xapi http requests via XHR or NODE (request module)
- * `$ node my-test.js`
  */
 
 if ((typeof module !== 'undefined' && module.exports)) {

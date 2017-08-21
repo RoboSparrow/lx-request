@@ -14,7 +14,7 @@ module.exports = function(grunt) {
                 'test/**/*.js' // tests
             ],
             options: {
-                configFile: '.eslintrc-node.json',
+                configFile: '.eslintrc.js',
                 // fix: true,                           // > enable for auto-fixing some stylistic issues
                 outputFile: ''                          // > output to cli
                 // outputFile: './log/eslint-errors'    // > output to file (no cli)

@@ -1,7 +1,6 @@
 /**
  * @author jboeselt
  * simple xapi http requests via XHR or NODE (request module)
- * `$ node my-test.js`
  */
 
 var req = (function() {
