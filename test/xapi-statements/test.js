@@ -59,7 +59,6 @@ describe('Basic connectivity', function() {
 });
 
 describe('req.xapi POST many statements', function() {
-
     let result;
     batchLength = 10;
     now = new Date();

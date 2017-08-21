@@ -13,7 +13,6 @@ if ((typeof module !== 'undefined' && module.exports)) {
     'use strict';
 
     var search = function(api, config, nextFn, dataFn) {
-
         var response = null;
         var prev = null;
         var next = null;
@@ -25,15 +24,15 @@ if ((typeof module !== 'undefined' && module.exports)) {
                 response = res;
                 return;
             }
-            var oldData = dataFn(response);
-            var newData = dataFn(res);
+            var oldData = dataFn(response, config);
+            var newData = dataFn(res, config);
             for (var i = 0; i < newData.length; i++) {
                 oldData.push(newData[i]);
             }
         };
 
         var success = function(res, ins) {
-            next = nextFn(res);
+            next = nextFn(res, config);
             aggregate(res);
             if (!next || next === prev) {
                 // replace data with aggregated data in current response
@@ -48,7 +47,6 @@ if ((typeof module !== 'undefined' && module.exports)) {
 
         config.success = success;
         req.xapi.get(api, config);
-
     };
 
     /**
@@ -166,10 +164,18 @@ if ((typeof module !== 'undefined' && module.exports)) {
 
     req.xapi.statements = function(config) {
         return search('/statements', config,
-            function(res) {
-                return res.data.more.replace(/^\/xapi/i, ''); // ADL more, TODO check learninglocker
+            // callback for building parse more url
+            function(res, conf) {
+                var more = res.data.more || null;
+                if (!more) {
+                    return null;
+                }
+                conf.query = null;
+                var parts = more.split('/statements');
+                return '/statements' + parts[parts.length - 1]; // ADL more, TODO check learninglocker
             },
-            function(res) {
+            // callback for fetching data
+            function(res, conf) {
                 return res.data.statements;
             }
         );

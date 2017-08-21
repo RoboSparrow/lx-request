@@ -5,7 +5,8 @@
 0.1.0
 
 - new `req.xapi.statements()` method: automatic aggregation of GET /statements with `more` urls
-A custom callback can be submitted for parsing more urls against the configured endpoint
+Currently supported more patterns: (lxHive, learninglocker, scorm cloud, lrs.adlnet.gov)
+A allback can be submitted for parsing custom `more` patterns against the configured lrs
 - better json request check
 - case insensitive header property access
 - Improved encoding of complex config.query param values (objects, arrays) for json requests.

@@ -103,7 +103,7 @@ var req = (function() {
             '[object Uint8Array]'
         ];
     }
-    
+
     //// parse JSON
     var _parseRequestBody = function(config) {
         if (_isJsonRequest(config)) {
@@ -111,13 +111,13 @@ var req = (function() {
                 return JSON.stringify(config.data);
             } catch (e) {
                 //@TODO
-                console.error(e);
+                console.error('Failed to parse request JSON: ' + e.message);
             }
             return config.data;
         }
         return _parseRawRequestBody(config.data);
     };
-    
+
     var _parseRawRequestBody = function(data) {
         // string: we assume it was uri-encoded already
         if (typeof data  === 'string') {
@@ -148,8 +148,7 @@ var req = (function() {
                 return JSON.parse(body);
             } catch (e) {
                 //@TODO
-                console.log(body);
-                console.error(e);
+                console.error('Failed to parse response JSON: ' + e.message);
             }
         }
         return body;
@@ -173,17 +172,17 @@ var req = (function() {
         }
         return str.join('&');
     };
-    
+
     //// encode a javascript object into a query string
     var _encodeQuery = function(config) {
         var str = [];
         var obj = config.query;
         var val;
-        
+
         if (!_isJsonRequest(config)) {
             return _encodeData(obj);// if deep nested obj php-like query
         }
-        
+
         for (var key in obj) {
             if (obj.hasOwnProperty(key)) {
                 //TODO redundant, but faster!
