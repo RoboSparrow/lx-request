@@ -34,7 +34,7 @@ var req = (function() {
         var search = key.toLowerCase();
         var l;
         for (var k in obj) {
-            if (obj.hasOwnkeyerty(k)) {
+            if (obj.hasOwnProperty(k)) {
                 l = k.toLowerCase();
                 if (search === l) {
                     return obj[k];
