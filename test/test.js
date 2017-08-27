@@ -3,7 +3,7 @@
 let server = require('./helper.server');
 let assert = require('assert');
 
-let req = require('../req.xapi');
+let req = require('../req');
 
 describe('test', function() {
 

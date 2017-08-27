@@ -162,22 +162,42 @@ if ((typeof module !== 'undefined' && module.exports)) {
     };
 
     req.xapi.statements = function(config) {
-        return search('/statements', config,
-            // callback for building parse more url
-            function(res, conf) {
-                var more = res.data.more || null;
-                if (!more) {
-                    return null;
+        var p = config.promise || false;
+        
+        var fn = function() {
+            search('/statements', config,
+                // callback for building parse more url
+                function(res, conf) {
+                    var more = res.data.more || null;
+                    if (!more) {
+                        return null;
+                    }
+                    conf.query = null;
+                    var parts = more.split('/statements');
+                    return '/statements' + parts[parts.length - 1]; // ADL more, TODO check learninglocker
+                },
+                // callback for fetching data
+                function(res, conf) {
+                    return res.data.statements;
                 }
-                conf.query = null;
-                var parts = more.split('/statements');
-                return '/statements' + parts[parts.length - 1]; // ADL more, TODO check learninglocker
-            },
-            // callback for fetching data
-            function(res, conf) {
-                return res.data.statements;
-            }
-        );
+            );
+        };
+        
+        if (p) {
+            config.promise = false;
+
+            return new req.Promise(function(resolve, reject) {
+                config.success = function(data) {
+                    resolve(data);
+                };
+                config.error = function(data) {
+                    reject(data);
+                };
+                fn();
+            });
+        }
+
+       fn();
     };
 
     ////

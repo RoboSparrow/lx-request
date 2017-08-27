@@ -25,6 +25,11 @@ var req = (function() {
         var Url = require('url');
     }
 
+    // checks ES6 promise support and attaches native Promise, can be substituted
+    exports.Promise = (typeof Promise !== 'function') ? function() {
+        throw new Error('"promise" flag was set in request config but the system doesn\'t support ES6 Promise, use callbacks instead.');
+    } : Promise;
+
     ////
     // Utils
     ////
@@ -367,6 +372,7 @@ var req = (function() {
         // 'raw' in comments below: xhr or http.ClientRequest
         var defaults = {
             method: 'GET',
+            promise: false,
             query: {},
             headers: {},
             data: null,
@@ -386,11 +392,22 @@ var req = (function() {
             url = url + '?' + query;
         }
 
-        // invoke request
-        if (NODE) {
-            return _httpRequest(url, config);
+        var fn = (NODE) ? _httpRequest : _xhrRequest;
+
+        if (config.promise === true) {
+            
+            return new exports.Promise(function(resolve, reject) {
+                config.success = function(data) {
+                    resolve(data);
+                };
+                config.error = function(data) {
+                    reject(data);
+                };
+                fn(url, config);
+            });
         }
-        return _xhrRequest(url, config);
+
+        return fn(url, config);
     };
 
     //// json request

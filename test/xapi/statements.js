@@ -9,11 +9,16 @@ req.xapi.AUTH = 'Basic ' + req.xapi.toBase64(config.auth);
 req.xapi.VERSION = config.version;
 
 const registration = req.xapi.uuid();
-let batchLength;
+const batchLength = 10;
+const queryLimit = 2;
+const expectedSteps = batchLength/queryLimit;
+
 let now;
 let retrieved; //array of statement.ids
 
-var createStatements = (length) => {
+//TODO test xapi legacy
+
+const createStatements = (length) => {
     const smts = [];
     for (let i = 0; i < length; i++) {
         smts.push({
@@ -34,7 +39,7 @@ var createStatements = (length) => {
     return smts;
 };
 
-describe('Basic connectivity', function() {
+describe('req.xapi basic connectivity', function() {
     let result;
 
     before(function(done) {
@@ -60,7 +65,6 @@ describe('Basic connectivity', function() {
 
 describe('req.xapi POST many statements', function() {
     let result;
-    batchLength = 10;
     now = new Date();
 
     const statements = createStatements(batchLength);
@@ -97,13 +101,14 @@ describe('req.xapi.statements get many with limit', function() {
     this.timeout(0);
 
     let result;
+    let count = 0;
 
     before(function(done) {
         req.xapi.statements(
             {
                 query: {
                     since: now.toISOString(),
-                    limit: 2,
+                    limit: queryLimit,
                     registration: registration
                 },
                 success: function(res, ins) {
@@ -113,6 +118,9 @@ describe('req.xapi.statements get many with limit', function() {
                 error: function(res, ins) {
                     result = res;
                     setTimeout(done, 500);
+                },
+                always: function(result) {
+                    count++;
                 }
             }
         );
@@ -122,6 +130,7 @@ describe('req.xapi.statements get many with limit', function() {
         assert.strictEqual(result.status, 200, 'response status: 200');
         assert.strictEqual(Object.prototype.toString.call(result.data.statements), '[object Array]', 'is an array');
         assert.strictEqual(result.data.statements.length, batchLength, 'has ' + batchLength + ' elements');
+        assert.strictEqual(count, expectedSteps, 'aggregted in ' + expectedSteps + ' steps');
 
         const ids = result.data.statements.map((smt) => {
             return smt.id;
