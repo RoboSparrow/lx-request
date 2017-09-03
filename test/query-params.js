@@ -3,7 +3,7 @@
 const server = require('./helper.server');
 const assert = require('assert');
 
-const req = require('../req.xapi');
+const req = require('../req');
 
 describe('request query parsing', function() {
 
@@ -39,31 +39,18 @@ describe('request query parsing', function() {
     });
 
     it('if request is `application/json` then complex GET params sholuld be parsed to json', function(done) {
-
         req.json(url + '/200', {
             query: {
                 agent
             },
             always: function(result, response) {
+
                 assert.strictEqual(result.status, 200);
                 assert.strictEqual(result.headers['x-req-content-type'], 'application/json');
 
                 const search = result.headers['x-req-search'];
                 const expected = '?agent=' + JSON.stringify(agent);
                 assert.strictEqual(decodeURIComponent(search), expected);
-                done();
-            }
-        });
-    });
-
-    it('if request.xapi then complex GET params sholuld be parsed to json', function(done) {
-        req.xapi('/statements', {
-            query: {
-                agent
-            },
-            always: function(result, response) {
-                assert.strictEqual(result.status, 200);
-                assert.strictEqual(Object.prototype.toString.call(result.data.statements), '[object Array]', 'is an array');
                 done();
             }
         });

@@ -163,7 +163,7 @@ if ((typeof module !== 'undefined' && module.exports)) {
 
     req.xapi.statements = function(config) {
         var p = config.promise || false;
-        
+
         var fn = function() {
             search('/statements', config,
                 // callback for building parse more url
@@ -182,7 +182,7 @@ if ((typeof module !== 'undefined' && module.exports)) {
                 }
             );
         };
-        
+
         if (p) {
             config.promise = false;
 
@@ -197,7 +197,7 @@ if ((typeof module !== 'undefined' && module.exports)) {
             });
         }
 
-       fn();
+        fn();
     };
 
     ////

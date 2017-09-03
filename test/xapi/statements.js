@@ -11,7 +11,7 @@ req.xapi.VERSION = config.version;
 const registration = req.xapi.uuid();
 const batchLength = 10;
 const queryLimit = 2;
-const expectedSteps = batchLength/queryLimit + 1; // n resonses(more !== null) + 1 response(more === null)
+const expectedSteps = batchLength / queryLimit + 1; // n resonses(more !== null) + 1 response(more === null)
 
 let now;
 let retrieved; //array of statement.ids

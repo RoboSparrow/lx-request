@@ -115,7 +115,7 @@ var req = (function() {
                 return JSON.stringify(config.data);
             } catch (e) {
                 //@TODO
-                console.error('Failed to parse request JSON: ' + e.message);
+                console.error('parseRequestBody; Failed to parse request JSON: ' + e.message);
             }
             return config.data;
         }
@@ -152,7 +152,7 @@ var req = (function() {
                 return JSON.parse(body);
             } catch (e) {
                 //@TODO
-                console.error('Failed to parse response JSON: ' + e.message);
+                console.error('_parseResponseBody: Failed to parse response JSON: ' + e.message);
             }
         }
         return body;
@@ -386,7 +386,7 @@ var req = (function() {
             headers: {},
             data: null,
             responseType: '',//?TODO
-            transformRequest: false,   // function(mergedConfig, parsedData, xhrInstance|httpRequestOptions)
+            transformRequest: false,    // function(mergedConfig, parsedData, xhrInstance|httpRequestOptions)
             transformResponse: false,   // function(raw)
             success: function() {},     // (Response, raw)
             error: function() {},       // (Response, raw)

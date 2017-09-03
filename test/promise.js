@@ -100,7 +100,6 @@ describe('promise', function() {
 
     it('should still invoke config.always callback', function() {
         var called = false;
-        console.log(called);
         return req.request(url + '/200', {
             promise: true,
             always: function(result) {

@@ -66,12 +66,10 @@ describe('req.xapi promise', function() {
 describe('req.xapi promise POST many statements', function() {
     const batchLength = 10;
     const queryLimit = 2;
-    const expectedSteps = batchLength/queryLimit;
+    const expectedSteps = batchLength / queryLimit + 1; // n resonses(more !== null) + 1 response(more === null)
 
     const registration = req.xapi.uuid();
     const now = new Date();
-
-    let retrieved;
     let count = 0;
 
     it('POST /statements: write ' + batchLength + ' statements to LRS', function() {
@@ -84,7 +82,6 @@ describe('req.xapi promise POST many statements', function() {
             promise: true
         })
         .then(function(result) {
-            retrieved = result.data;
             assert.strictEqual(result.status, 200, 'response status: 200');
             assert.strictEqual(result.data.length, batchLength, 'has ' + batchLength + ' elements');
             return req.xapi.statements({

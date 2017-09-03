@@ -9,8 +9,6 @@ req.xapi.AUTH = 'Basic ' + req.xapi.toBase64(config.auth);
 req.xapi.VERSION = config.version;
 
 const registration = req.xapi.uuid();
-
-let now;
 let retrieved = []; //array of statement.ids
 
 //TODO test xapi legacy
