@@ -291,6 +291,10 @@ var req = (function() {
             data = _parseRequestBody(config);
         }
 
+        if (typeof config.transformRequest === 'function') {
+            config.transformRequest(config, data, xhr);
+        }
+
         xhr.send(data);
         return xhr;
     };
@@ -300,7 +304,9 @@ var req = (function() {
 
         var _url =  Url.parse(url);
         var module = (_url.protocol === 'https:') ? https : http;
-        var data = '';
+
+        var data = null; // parsed request data
+        var _data = ''; // the incoming data stream
 
         var options = {
             host: (_url.port) ? _url.host.replace(':' + _url.port, '') : _url.host,
@@ -308,13 +314,16 @@ var req = (function() {
             port: _url.port,
             query: _url.query,
             method: config.method,
-            headers: config.headers,
-            body: config.data
+            headers: config.headers
         };
 
         if (config.data) {
-            config.data = _parseRequestBody(config);
-            options.headers['content-length'] = Buffer.byteLength(config.data);
+            data = _parseRequestBody(config);
+            options.headers['content-length'] = Buffer.byteLength(data);
+        }
+
+        if (typeof config.transformRequest === 'function') {
+            config.transformRequest(config, data, options);
         }
 
         var result = new Response();
@@ -323,14 +332,14 @@ var req = (function() {
 
             res.on('data', function(chunk) {
                 // @var res: http.IncomingMessage
-                data += chunk;
+                _data += chunk;
             });
 
             res.on('end', function() {
 
                 result.status = res.statusCode;
                 result.statusText = res.statusMessage;
-                result.data = _parseResponseBody(data, config);
+                result.data = _parseResponseBody(_data, config);
                 result.headers = res.headers;
 
                 if (res.statusCode < 299) {
@@ -348,8 +357,8 @@ var req = (function() {
 
         });
 
-        if (config.data) {
-            request.write(config.data);
+        if (data) {
+            request.write(data);
         }
 
         request.on('error', function(error) {
@@ -377,6 +386,7 @@ var req = (function() {
             headers: {},
             data: null,
             responseType: '',//?TODO
+            transformRequest: false,   // function(mergedConfig, parsedData, xhrInstance|httpRequestOptions)
             transformResponse: false,   // function(raw)
             success: function() {},     // (Response, raw)
             error: function() {},       // (Response, raw)
@@ -395,7 +405,7 @@ var req = (function() {
         var fn = (NODE) ? _httpRequest : _xhrRequest;
 
         if (config.promise === true) {
-            
+
             return new exports.Promise(function(resolve, reject) {
                 config.success = function(data) {
                     resolve(data);
