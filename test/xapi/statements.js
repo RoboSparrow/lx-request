@@ -11,7 +11,7 @@ req.xapi.VERSION = config.version;
 const registration = req.xapi.uuid();
 const batchLength = 10;
 const queryLimit = 2;
-const expectedSteps = batchLength/queryLimit;
+const expectedSteps = batchLength/queryLimit + 1; // n resonses(more !== null) + 1 response(more === null)
 
 let now;
 let retrieved; //array of statement.ids
@@ -23,13 +23,13 @@ const createStatements = (length) => {
     for (let i = 0; i < length; i++) {
         smts.push({
             actor: {
-                mbox: 'mailto:anonymous@lxhive.com'
+                mbox: 'mailto:anonymous@xreq.com'
             },
             verb: {
                 id: 'http://adlnet.gov/expapi/verbs/attempted'
             },
             object: {
-                id: 'http://lxhive.com/activities/lrs-check/' + i
+                id: 'http://xreq.com/activities/lrs-check/' + i
             },
             context: {
                 registration: registration
@@ -40,6 +40,9 @@ const createStatements = (length) => {
 };
 
 describe('req.xapi basic connectivity', function() {
+    // eslint-disable-next-line no-invalid-this
+    this.timeout(0);
+
     let result;
 
     before(function(done) {
@@ -64,6 +67,9 @@ describe('req.xapi basic connectivity', function() {
 });
 
 describe('req.xapi POST many statements', function() {
+    // eslint-disable-next-line no-invalid-this
+    this.timeout(0);
+
     let result;
     now = new Date();
 
