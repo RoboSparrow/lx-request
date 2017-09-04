@@ -27,7 +27,7 @@ describe('Callback sequence order', function() {
 
     it('should follow the callback order for a successful (200) request', function(done) {
         const called = [];
-        const expected = ['transformRequest', 'transformResponse', 'success', 'always'] ;
+        const expected = ['transformRequest', 'transformResponse', 'success', 'always'];
         req.request(
             url + '/200',
             {
@@ -71,7 +71,7 @@ describe('Callback sequence order', function() {
 
     it('should follow the callback for an errornous (400) request', function(done) {
         const called = [];
-        const expected = ['transformRequest', 'transformResponse', 'error', 'always'] ;
+        const expected = ['transformRequest', 'transformResponse', 'error', 'always'];
         req.request(
             url + '/400',
             {
