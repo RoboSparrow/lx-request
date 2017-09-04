@@ -11,6 +11,11 @@ const server = (() => {
         let url = Url.parse(request.url);
         let extname = path.extname(url.pathname).toLowerCase();
         let name = path.basename(url.pathname, extname);
+        let dirname = path.dirname(url.pathname);
+
+        if (/\/xapi/ig.test(dirname)) {
+            extname = '.json';
+        }
 
         let mimeTypes = {
             '.html': 'text/html',
@@ -44,6 +49,13 @@ const server = (() => {
         });
 
         request.on('end', () => {
+            // xapi mock
+            if (dirname === '/xapi') {
+                response.end(body, 'utf-8');
+                return;
+            }
+
+            // default
             switch (name) {
                 case '404':
                     response.statusCode = 404;
