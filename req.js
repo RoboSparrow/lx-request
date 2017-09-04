@@ -342,12 +342,11 @@ var req = (function() {
                 result.data = _parseResponseBody(_data, config);
                 result.headers = res.headers;
 
+                if (typeof config.transformResponse === 'function') {
+                    config.transformResponse(result);
+                }
+
                 if (res.statusCode < 299) {
-
-                    if (typeof config.transformResponse === 'function') {
-                        config.transformResponse(result);
-                    }
-
                     config.success(result, res);
                 } else {
                     config.error(result, res);
