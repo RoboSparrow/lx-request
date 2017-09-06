@@ -159,6 +159,7 @@ var req = (function() {
     };
 
     //// encode a javascript object into a query string
+    // TODO merge, review, see https://github.com/angular/angular.js/blob/master/src/ng/http.js#L60 and https://stackoverflow.com/a/30970229
     var _encodeData = function(obj, prefix) {
         if (Object.prototype.toString.call(obj) === '[object Array]') {
             obj = obj.reduce(function(o, v, i) {
@@ -178,6 +179,7 @@ var req = (function() {
     };
 
     //// encode a javascript object into a query string
+    // TODO merge with above
     var _encodeQuery = function(config) {
         var str = [];
         var obj = config.query;

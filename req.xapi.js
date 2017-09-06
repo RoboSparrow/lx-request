@@ -49,10 +49,8 @@ if ((typeof module !== 'undefined' && module.exports)) {
     };
 
     /**
-     * @see https://github.com/adlnet/xAPI-Spec/blob/master/xAPI.md#cors
-     * @see https://blogs.msdn.microsoft.com/ieinternals/2010/05/13/xdomainrequest-restrictions-limitations-and-workarounds/
+     * for details @see ./test/xapi/legacy.js
      */
-
     var transformRequestLegacy = function(config) {
 
         // responseType
@@ -60,7 +58,9 @@ if ((typeof module !== 'undefined' && module.exports)) {
 
         // headers: add to data and remove
         var data = config.headers;
-        config.headers = {};
+        config.headers = {
+            'Content-Type': 'application/x-www-form-urlencoded' //content-length is added by raw
+        };
 
         // query
         var query = config.query || null;
@@ -78,6 +78,7 @@ if ((typeof module !== 'undefined' && module.exports)) {
 
         // method
         config.transformResponse = function(response) {
+            //var json = encodeURIComponent(response.data);
             try {
                 response.data = JSON.parse(response.data);
             } catch (e) {
@@ -88,10 +89,11 @@ if ((typeof module !== 'undefined' && module.exports)) {
 
         // data
         if (typeof config.data !== 'undefined') {
-            data.content = config.data;
+            data.content = JSON.stringify(config.data);
         }
+        // TODO check serialization in req module
+        // TODO add form-url encoded request to req module
         config.data = data;
-
         return config;
     };
 

@@ -3,6 +3,7 @@
 const http = require('http');
 const path = require('path');
 const Url = require('url');
+const querystring = require('querystring');
 // let fs = require('fs');
 
 const server = (() => {
@@ -51,6 +52,20 @@ const server = (() => {
         request.on('end', () => {
             // xapi mock
             if (dirname === '/xapi') {
+                // legacy mode
+                // @see https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Communication.md#alt-request-syntax
+                if(request.headers['content-type'] === 'application/x-www-form-urlencoded') {
+                    body = querystring.parse(body);
+                    if (typeof body.content !== 'undefined') {
+                        try {
+                            body.content = JSON.parse(body.content);
+                        } catch (e) {
+                            response.statusCode = 500;
+                            response.end('error parsing content: ' + e.messsage, 'utf-8');
+                        }
+                    }
+                    body = JSON.stringify(body);
+                }
                 response.end(body, 'utf-8');
                 return;
             }
@@ -71,12 +86,11 @@ const server = (() => {
                     break;
                 case '400':
                     response.statusCode = 400;
-                    response.end('body', 'utf-8');
+                    response.end(body, 'utf-8');
                     break;
                 default:
                     response.statusCode = 500;
-                    response.end('Sorry, error: 500 ..\n');
-                    response.end('body', 'utf-8');
+                    response.end(body, 'utf-8');
             }
 
         });
