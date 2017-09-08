@@ -14,7 +14,9 @@ const server = (() => {
         let name = path.basename(url.pathname, extname);
         let dirname = path.dirname(url.pathname);
 
-        if (/\/xapi/ig.test(dirname)) {
+        const isXapi = /\/xapi/ig.test(dirname);
+
+        if (isXapi) {
             extname = '.json';
         }
 
@@ -51,7 +53,7 @@ const server = (() => {
 
         request.on('end', () => {
             // xapi mock
-            if (dirname === '/xapi') {
+            if (isXapi) {
                 // legacy mode
                 // @see https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Communication.md#alt-request-syntax
                 if(request.headers['content-type'] === 'application/x-www-form-urlencoded') {
