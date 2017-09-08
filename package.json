@@ -21,7 +21,7 @@
   "scripts": {
     "dev": "./node_modules/.bin/grunt watch",
     "lint": "./node_modules/.bin/eslint -c *.js test/**/*.js",
-    "test": "./node_modules/.bin/mocha"
+    "test": "./node_modules/.bin/mocha --watch"
   },
   "license": ""
 }
