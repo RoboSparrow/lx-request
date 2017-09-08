@@ -76,9 +76,11 @@ if ((typeof module !== 'undefined' && module.exports)) {
         // method
         config.method = 'POST';
 
-        // method
+        //parse raw request response as json
         config.transformResponse = function(response) {
-            //var json = encodeURIComponent(response.data);
+            if (!response.data) {
+                return;
+            }
             try {
                 response.data = JSON.parse(response.data);
             } catch (e) {
@@ -97,19 +99,19 @@ if ((typeof module !== 'undefined' && module.exports)) {
         return config;
     };
 
-    var defaults = function() {
+    var defaults = function(xapi) {
         return {
             headers: {
                 'Content-Type'             : 'application/json',
-                'Authorization'            : req.xapi.AUTH,
-                'X-Experience-API-Version' : req.xapi.VERSION
+                'Authorization'            : xapi.auth,
+                'X-Experience-API-Version' : xapi.version
             },
             responseType: 'json'
         };
     };
 
-    var endpoint = function(api) {
-        return req.xapi.LRS + api;
+    var endpoint = function(xapi, api) {
+        return xapi.lrs + api;
     };
 
     ////
@@ -117,11 +119,17 @@ if ((typeof module !== 'undefined' && module.exports)) {
     ////
 
     req.xapi = function(api, config) {
-        var url = endpoint(api);
 
-        config = req.mergeHash(defaults(), config);
+        var xapi     = config.xapi  || {};
+        xapi.lrs     = xapi.lrs     || req.xapi.LRS;
+        xapi.auth    = xapi.auth    || req.xapi.AUTH;
+        xapi.version = xapi.version || req.xapi.VERSION;
+        xapi.legacy  = xapi.legacy  || req.xapi.LEGACY;
 
-        if (req.xapi.LEGACY) {
+        var url = endpoint(xapi, api);
+        config = req.mergeHash(defaults(xapi), config);
+
+        if (xapi.legacy) {
             config = transformRequestLegacy(config);
             return req.raw(url, config);
         }
