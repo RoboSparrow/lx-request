@@ -108,6 +108,11 @@ var req = (function() {
         ];
     }
 
+    var _isScalar = function(v) {
+        var type = typeof(v);
+        return (v === null || type.indexOf(['string', 'number', 'boolean']) > -1);
+    };
+
     //// parse JSON
     var _parseRequestBody = function(config) {
         if (_isJsonRequest(config)) {
@@ -131,7 +136,7 @@ var req = (function() {
         if (typeof data  !== 'object') {
             return encodeURIComponent(data);
         }
-        //
+        // TODO optimise
         var _type = Object.prototype.toString.call(data);
         if (sendableRawDataFormats.indexOf(_type) > -1) {
             return data;
@@ -191,12 +196,7 @@ var req = (function() {
 
         for (var key in obj) {
             if (obj.hasOwnProperty(key)) {
-                //TODO redundant, but faster!
-                if (obj[key] === null || typeof obj[key] === 'string' || typeof obj[key] === 'number' || typeof obj[key] === 'boolean') {
-                    val = obj[key];
-                } else {
-                    val = JSON.stringify(obj[key]);
-                }
+                val = (_isScalar(val)) ? obj[key] : JSON.stringify(obj[key]);
                 str.push(encodeURIComponent(key) + '=' + encodeURIComponent(val));
             }
         }
@@ -387,7 +387,7 @@ var req = (function() {
             headers: {},
             data: null,
             responseType: '',//?TODO
-            transformRequest: false,    // function(mergedConfig, parsedData, xhrInstance|httpRequestOptions)
+            transformRequest: false,    // inspect a request who is about to be sent. function(mergedConfig, parsedData, xhrInstance|httpRequestOptions) note that config changes will have no effect
             transformResponse: false,   // function(raw)
             success: function() {},     // (Response, raw)
             error: function() {},       // (Response, raw)
