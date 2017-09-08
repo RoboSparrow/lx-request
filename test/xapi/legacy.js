@@ -16,6 +16,7 @@ const beforeTest = function() {
 const afterTest =function() {
     server.close();
 };
+
 //
 // @see https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Communication.md#appendix-c-cross-domain-request-example
 //
@@ -48,6 +49,7 @@ const afterTest =function() {
 // @see https://github.com/adlnet/xAPI-Spec/blob/master/xAPI.md#cors
 // @see https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Communication.md#alt-request-syntax
 // @see https://blogs.msdn.microsoft.com/ieinternals/2010/05/13/xdomainrequest-restrictions-limitations-and-workarounds/
+//
 
 describe('req.xapi cross domain mode', function() {
 
