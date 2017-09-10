@@ -11,7 +11,7 @@ req.xapi.VERSION = config.version;
 const registration = req.xapi.uuid();
 const batchLength = 10;
 const queryLimit = 2;
-const expectedSteps = batchLength / queryLimit + 1; // n resonses(more !== null) + 1 response(more === null)
+const expectedSteps = batchLength / queryLimit;
 
 let now;
 let retrieved; //array of statement.ids
@@ -136,7 +136,7 @@ describe('req.xapi.statements get many with limit', function() {
         assert.strictEqual(result.status, 200, 'response status: 200');
         assert.strictEqual(Object.prototype.toString.call(result.data.statements), '[object Array]', 'is an array');
         assert.strictEqual(result.data.statements.length, batchLength, 'has ' + batchLength + ' elements');
-        assert.strictEqual(count, expectedSteps, 'aggregted in ' + expectedSteps + ' steps');
+        assert.strictEqual(count, expectedSteps, 'aggregated in ' + expectedSteps + ' steps');
 
         const ids = result.data.statements.map((smt) => {
             return smt.id;

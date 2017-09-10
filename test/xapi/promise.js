@@ -55,10 +55,6 @@ describe('req.xapi promise', function() {
             assert.strictEqual(result.status, 200);
             assert.strictEqual(typeof (result.data.statements), 'object');
         })
-        .catch(function(result) {
-            console.log('CATCH ERROR: ', result);
-            assert.strictEqual(true, false);
-        })
         ;
     });
 });
@@ -102,10 +98,6 @@ describe('req.xapi promise POST many statements', function() {
             assert.strictEqual(result.data.statements.length, batchLength, 'has ' + batchLength + ' elements');
             assert.strictEqual(count, expectedSteps, 'aggregted in ' + expectedSteps + ' steps');
         })
-        .catch(function(result) {
-            console.log('CATCH ERROR: ', result);
-            assert.strictEqual(true, false);
-        })
         ;
     });
 
@@ -133,10 +125,6 @@ describe('req.xapi promise POST many statements', function() {
     //         .then(function(result) {
     //             assert.strictEqual(result.status, 200);
     //             assert.strictEqual(typeof (result.data.statements), 'object');
-    //         })
-    //         .catch(function(result) {
-    //             console.log('CATCH ERROR: ', result);
-    //             assert.strictEqual(true, false);
     //         })
     //         ;
     //     });
