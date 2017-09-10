@@ -110,7 +110,7 @@ var req = (function() {
 
     var _isScalar = function(v) {
         var type = typeof(v);
-        return (v === null || type.indexOf(['string', 'number', 'boolean']) > -1);
+        return v === null || ['string', 'number', 'boolean'].indexOf(type) > -1;
     };
 
     //// parse JSON
@@ -196,7 +196,7 @@ var req = (function() {
 
         for (var key in obj) {
             if (obj.hasOwnProperty(key)) {
-                val = (_isScalar(val)) ? obj[key] : JSON.stringify(obj[key]);
+                val = (_isScalar(obj[key])) ? obj[key] : JSON.stringify(obj[key]);
                 str.push(encodeURIComponent(key) + '=' + encodeURIComponent(val));
             }
         }
