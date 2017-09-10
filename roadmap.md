@@ -3,7 +3,7 @@
 * simple promise support
 * xapi legacy & req.application/x-www-form-urlencoded
 * xapi statements: cap
-
+* xapi switch lrs config for single calls
 
 0.2.1
 
