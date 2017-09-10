@@ -119,6 +119,7 @@ module.exports = {
         "space-unary-ops": ["error", { "words": true, "nonwords": false }],
         "unicode-bom": ["error", "never"],
         // custom
-        "indent": ["error", 4, { "SwitchCase": 1 }]
+        "indent": ["error", 4, { "SwitchCase": 1 }],
+        "no-multiple-empty-lines": ["error", { "max": 2, "maxBOF": 1 , "maxEOF": 1 }]
     }
 };
