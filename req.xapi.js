@@ -51,32 +51,44 @@ if ((typeof module !== 'undefined' && module.exports)) {
     /**
      * for details @see ./test/xapi/legacy.js
      */
-    var transformRequestLegacy = function(config) {
+    var transformRequestLegacy = function(config, queryString) {
 
         // responseType
-        config.responseType = '';
+        queryString = queryString || '';
+        var method = config.method || 'GET';
+        var headers = config.headers || null;
+        var query = config.query || null;
+        var data = config.data || null;
 
-        // headers: add to data and remove
-        var data = config.headers;
+        var sData = [];
+
+        if (queryString) {
+            sData.push(queryString);
+        }
+
+        if (query) {
+            sData.push(req.serialize(query));
+        }
+
+        if (headers) {
+            sData.push(req.serialize(headers));
+        }
+
+        if (data) {
+            var json = JSON.stringify(config.data);
+            sData.push('Content-Length=' + json.length);
+            sData.push('content=' + encodeURIComponent(json));
+        }
+
+        //// transform config
+        config.responseType = '';
         config.headers = {
             'Content-Type': 'application/x-www-form-urlencoded' //content-length is added by raw
         };
-
-        // query
-        var query = config.query || null;
-
-        if (query) {
-            data = req.mergeHash(data, query);
-        }
-        // query only method params allowed according to spec
         config.query = {
-            method: config.method || 'GET'
+            method: method
         };
-
-        // method
         config.method = 'POST';
-
-        //parse raw request response as json
         config.transformResponse = function(response) {
             if (!response.data) {
                 return;
@@ -88,15 +100,21 @@ if ((typeof module !== 'undefined' && module.exports)) {
                 console.error(e);
             }
         };
+        // add sData
+        config.data = sData.join('&');
 
-        // data
-        if (typeof config.data !== 'undefined') {
-            data.content = JSON.stringify(config.data);
-        }
-        // TODO check serialization in req module
-        // TODO add form-url encoded request to req module
-        config.data = data;
         return config;
+    };
+
+    var lrs = function(config) {
+        var xapi = config.xapi || {};
+
+        return {
+            lrs:     xapi.lrs     || req.xapi.LRS,
+            auth:    xapi.auth    || req.xapi.AUTH,
+            version: xapi.version || req.xapi.VERSION,
+            legacy : (typeof xapi.legacy !== 'undefined') ? xapi.legacy : req.xapi.LEGACY
+        };
     };
 
     var defaults = function(xapi) {
@@ -110,8 +128,8 @@ if ((typeof module !== 'undefined' && module.exports)) {
         };
     };
 
-    var endpoint = function(xapi, api) {
-        return xapi.lrs + api;
+    var endpoint = function(lrs, api) {
+        return lrs + api;
     };
 
     ////
@@ -120,18 +138,23 @@ if ((typeof module !== 'undefined' && module.exports)) {
 
     req.xapi = function(api, config) {
 
-        var xapi     = config.xapi  || {};
-        xapi.lrs     = xapi.lrs     || req.xapi.LRS;
-        xapi.auth    = xapi.auth    || req.xapi.AUTH;
-        xapi.version = xapi.version || req.xapi.VERSION;
-        xapi.legacy  = xapi.legacy  || req.xapi.LEGACY;
+        // xapi config
+        var xapi = lrs(config);
+        config.xapi = undefined; // overwrite temporarily
 
-        var url = endpoint(xapi, api);
+        // merge config and re-attach xapi for debug
+        // note it's still possible to overwrite default headers
+        // TODO req.DEBUG
         config = req.mergeHash(defaults(xapi), config);
+        config.xapi = xapi;
 
-        if (xapi.legacy) {
-            config = transformRequestLegacy(config);
-            return req.raw(url, config);
+        // build url
+        var url = endpoint(xapi.lrs, api);
+
+        if (config.xapi.legacy) {
+            var parts = url.split('?');
+            config = transformRequestLegacy(config, parts[1]);
+            return req.raw(parts[0], config);
         }
 
         return req.request(url, config);// note the order of merge. default overwrites are allowed
@@ -183,6 +206,7 @@ if ((typeof module !== 'undefined' && module.exports)) {
                         return null;
                     }
                     conf.query = null;
+                    //TODO
                     var parts = more.split('/statements');
                     return '/statements' + parts[parts.length - 1]; // ADL more, TODO check learninglocker
                 },
@@ -214,7 +238,6 @@ if ((typeof module !== 'undefined' && module.exports)) {
     // helper methods
     ////
 
-    // @see Math.uuid.js (v1.4)
     req.xapi.uuid = function() {
         return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
             // eslint-disable-next-line no-bitwise, eqeqeq
