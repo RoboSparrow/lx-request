@@ -109,13 +109,19 @@ var req = (function() {
     }
 
     var _isScalar = function(v) {
-        var type = typeof(v);
+        var type = typeof v;
         return v === null || ['string', 'number', 'boolean'].indexOf(type) > -1;
     };
 
-    //// parse JSON
+    //// parse Body
+    // TODO this is problematic:
+    // we should inspect the content-type-header, text/plain, multipart etc and the parse
+    // alternatively provide highlevel helper methods like req.multipart(), req.formdata()
+    // who parse body data and set headers appropriately before this request. in this case json maybe stay here as the most common complex type
     var _parseRequestBody = function(config) {
+        // TODO if string, return? @ see __parseRawRequestBody
         if (_isJsonRequest(config)) {
+            // TODO overwrite content type header
             try {
                 return JSON.stringify(config.data);
             } catch (e) {
@@ -128,7 +134,7 @@ var req = (function() {
     };
 
     var _parseRawRequestBody = function(data) {
-        // string: we assume it was uri-encoded already
+        // string: we assume it was encoded already
         if (typeof data  === 'string') {
             return data;
         }
@@ -142,7 +148,7 @@ var req = (function() {
             return data;
         }
 
-        return _encodeData(data);
+        return encodeData(data);
     };
 
     //// parse JSON
@@ -165,7 +171,7 @@ var req = (function() {
 
     //// encode a javascript object into a query string
     // TODO merge, review, see https://github.com/angular/angular.js/blob/master/src/ng/http.js#L60 and https://stackoverflow.com/a/30970229
-    var _encodeData = function(obj, prefix) {
+    var encodeData = function(obj, prefix) {
         if (Object.prototype.toString.call(obj) === '[object Array]') {
             obj = obj.reduce(function(o, v, i) {
                 o[i] = v;
@@ -177,7 +183,7 @@ var req = (function() {
         for (var p in obj) {
             if (obj.hasOwnProperty(p)) {
                 var k = prefix ? prefix + '[' + p + ']' : p, v = obj[p];
-                str.push(typeof v === 'object' ? _encodeData(v, k) : encodeURIComponent(k) + '=' + encodeURIComponent(v));
+                str.push(typeof v === 'object' ? encodeData(v, k) : encodeURIComponent(k) + '=' + encodeURIComponent(v));
             }
         }
         return str.join('&');
@@ -191,7 +197,7 @@ var req = (function() {
         var val;
 
         if (!_isJsonRequest(config)) {
-            return _encodeData(obj);// if deep nested obj php-like query
+            return encodeData(obj);// if deep nested obj php-like query
         }
 
         for (var key in obj) {
@@ -432,18 +438,19 @@ var req = (function() {
         return request(url, mergeHash(defaults, config));// note the order of merge. default overwrites are allowed
     };
 
-    //// raw request
-    exports.raw = function(url, config) {
-        return request(url, config);// note the order of merge. default overwrites are allowed
-    };
-
     ////
     //  export
     ////
 
     exports.mergeHash = mergeHash;
+    exports.serialize = encodeData;
+
     exports.request = request;
 
+    //// raw request
+    exports.raw = function(url, config) {
+        return request(url, config);// note the order of merge. default overwrites are allowed
+    };
     exports.get = function(url, config) {
         return request(url, config);
     };
