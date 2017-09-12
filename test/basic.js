@@ -5,21 +5,26 @@ let assert = require('assert');
 
 let req = require('../req');
 
+const beforeSpec = function(done) {
+    server.listen(8000);
+    done();
+};
+
+const afterSpec = function(done) {
+    server.close();
+    done();
+};
+
 describe('Basic test', function() {
 
-    let url;
+    const url = 'http://localhost:8000';
 
-    before(function() {
-        url = server.listen(8000);
-    });
-
-    after(function() {
-        server.close();
-    });
+    before(beforeSpec);
+    after(afterSpec);
 
     it('should create a server', function(done) {
         var http = require('http');
-        http.get('http://localhost:8000/200.html', function(res) {
+        http.get(url + '/200.html', function(res) {
             assert.equal(200, res.statusCode);
             done();
         });

@@ -4,17 +4,19 @@ const assert = require('chai').assert;
 const req = require('../../req.xapi');
 const server = require('../helper.server');
 
-req.xapi.LRS = 'http://localhost:8000/xapi';
-req.xapi.AUTH = 'Basic ' + req.xapi.toBase64('test:test');
-req.xapi.VERSION = '1.0.2';
-req.xapi.LEGACY = true;
+const beforeSpec = function(done) {
+    req.xapi.LRS = 'http://localhost:8000/xapi';
+    req.xapi.AUTH = 'Basic ' + req.xapi.toBase64('test:test');
+    req.xapi.VERSION = '1.0.2';
+    req.xapi.LEGACY = true;
 
-const beforeTest = function() {
     server.listen(8000);
+    done();
 };
 
-const afterTest =function() {
+const afterSpec = function(done) {
     server.close();
+    done();
 };
 
 //
@@ -53,8 +55,8 @@ const afterTest =function() {
 
 describe('req.xapi cross domain mode', function() {
 
-    before(beforeTest);
-    after(afterTest);
+    before(beforeSpec);
+    after(afterSpec);
 
     it('should create a server', function(done) {
         var http = require('http');
@@ -116,7 +118,7 @@ describe('req.xapi cross domain mode', function() {
                 always: function(res, ins) {
                     // helper server returns body as received (encoded as JSON)
                     assert.strictEqual(res.data.statementId, id, 'attaches query param to json body');
-                    assert.strictEqual(typeof(res.data.content), 'object', 'body has a param "content"');
+                    assert.strictEqual(typeof res.data.content, 'object', 'body has a param "content"');
                     assert.strictEqual(JSON.stringify(res.data.content), JSON.stringify(data), 'body.conent contains payload data');
                     done();
                 }

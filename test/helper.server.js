@@ -9,7 +9,7 @@ const querystring = require('querystring');
 const server = (() => {
     return http.createServer(function(request, response) {
 
-        let url = Url.parse(request.url);
+        const url = Url.parse(request.url);
         let extname = path.extname(url.pathname).toLowerCase();
         let name = path.basename(url.pathname, extname);
         let dirname = path.dirname(url.pathname);
@@ -56,7 +56,7 @@ const server = (() => {
             if (isXapi) {
                 // legacy mode
                 // @see https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Communication.md#alt-request-syntax
-                if(request.headers['content-type'] === 'application/x-www-form-urlencoded') {
+                if (request.headers['content-type'] === 'application/x-www-form-urlencoded') {
                     body = querystring.parse(body);
                     if (typeof body.content !== 'undefined') {
                         try {
@@ -102,7 +102,7 @@ const server = (() => {
 })();
 
 let listen = (port) => {
-    let url = `http://localhost:${port}`;
+    const url = `http://localhost:${port}`;
     server.listen(port);
     console.log(`Server running at ${url}`);
     return url;

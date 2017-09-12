@@ -9,23 +9,29 @@ const AUTH = 'Basic ' + req.xapi.toBase64('test:test');
 const VERSION = '1.0.2';
 const LEGACY = false;
 
-req.xapi.LRS = LRS;
-req.xapi.AUTH = AUTH;
-req.xapi.VERSION = VERSION;
-req.xapi.LEGACY = false;
-
-const beforeTest = function() {
-    server.listen(8000);
+const beforeTest = function(done) {
+    req.xapi.LRS = LRS;
+    req.xapi.AUTH = AUTH;
+    req.xapi.VERSION = VERSION;
+    req.xapi.LEGACY = false;
+    done();
 };
 
-const afterTest =function() {
+const beforeSpec = function(done) {
+    server.listen(8000);
+    done();
+};
+
+const afterSpec = function(done) {
     server.close();
+    done();
 };
 
 describe('req.xapi config.lrs overwrites global settings', function() {
 
-    before(beforeTest);
-    after(afterTest);
+    before(beforeSpec);
+    after(afterSpec);
+    beforeEach(beforeTest);
 
     it('should create a server', function(done) {
         var http = require('http');

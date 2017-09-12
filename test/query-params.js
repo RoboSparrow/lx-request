@@ -5,21 +5,26 @@ const assert = require('assert');
 
 const req = require('../req');
 
+const beforeSpec = function(done) {
+    server.listen(8000);
+    done();
+};
+
+const afterSpec = function(done) {
+    server.close();
+    done();
+};
+
 describe('request query parsing', function() {
 
-    let url;
+    const url = 'http://localhost:8000';
+
+    before(beforeSpec);
+    after(afterSpec);
 
     const agent = {
         mbox: 'mailto:test@test.test'
     };
-
-    before(function() {
-        url = server.listen(8000);
-    });
-
-    after(function() {
-        server.close();
-    });
 
     it('if request is not `application/json` then, complex GET params sholuld be parsed php-like', function(done) {
         req.request(url + '/200', {
