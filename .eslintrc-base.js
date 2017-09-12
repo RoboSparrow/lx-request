@@ -118,8 +118,11 @@ module.exports = {
         "space-infix-ops": "error",
         "space-unary-ops": ["error", { "words": true, "nonwords": false }],
         "unicode-bom": ["error", "never"],
-        // custom
+        // custom style
         "indent": ["error", 4, { "SwitchCase": 1 }],
-        "no-multiple-empty-lines": ["error", { "max": 2, "maxBOF": 1 , "maxEOF": 1 }]
+        "no-multiple-empty-lines": ["error", { "max": 2, "maxBOF": 1 , "maxEOF": 1 }],
+        // custom best practises
+        "max-depth": ["error", 4],
+        "max-params": ["error", 4]
     }
 };
