@@ -1,14 +1,18 @@
-0.2.0
+0.2.0 promise
 
 * simple promise support
 * xapi legacy & req.application/x-www-form-urlencoded
 * xapi statements: cap
 * xapi switch lrs config for single calls
 
-0.2.1
+0.2.1 security
 
+* xapi.AUTH only accept encoded
 * optimise low-level function (merge, parse etc)
+* mergeConfig: replace config merge with clone (destroy instances)
 * response object - debug options (url, headers)
+* maybe: req support for FormData and FileApi
+* req.DEBUG change mergin ing order of defaukts (overwrite) attach extra Data to response
 
 0.2.2
 
