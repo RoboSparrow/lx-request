@@ -443,7 +443,7 @@ var req = (function() {
     ////
 
     exports.mergeHash = mergeHash;
-    exports.serialize = encodeData;
+    exports.serializeParams = encodeData;
 
     exports.request = request;
 
