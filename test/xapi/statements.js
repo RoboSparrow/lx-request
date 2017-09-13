@@ -25,8 +25,6 @@ describe('req.xapi statements aggregation', function() {
     let now;
     let retrieved; //array of statement.ids
 
-    //TODO test xapi legacy
-
     const createStatements = (length) => {
         const smts = [];
         for (let i = 0; i < length; i++) {
@@ -72,7 +70,7 @@ describe('req.xapi statements aggregation', function() {
         // make sure the test is valid
         it('GET /about: makes sure the LRS is present', function(done) {
             assert.strictEqual(result.status, 200, 'response status: 200');
-            done();
+            setTimeout(done, 500);
         });
 
     });
@@ -108,7 +106,7 @@ describe('req.xapi statements aggregation', function() {
             assert.strictEqual(result.status, 200, 'response status: 200');
             assert.strictEqual(Object.prototype.toString.call(result.data), '[object Array]', 'is an array');
             assert.strictEqual(result.data.length, batchLength, 'has ' + batchLength + ' elements');
-            done();
+            setTimeout(done, 500);
         });
 
     });
@@ -153,7 +151,7 @@ describe('req.xapi statements aggregation', function() {
                 return smt.id;
             });
             assert.deepEqual(ids.reverse(), retrieved, 'statementIds are returned in reversed order');
-            done();
+            setTimeout(done, 500);
         });
 
     });

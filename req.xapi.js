@@ -40,7 +40,7 @@ if ((typeof module !== 'undefined' && module.exports)) {
                 return;
             }
             prev = next;
-            config.xapi.legacy = false; // TODO workaround for https://github.com/adlnet/xAPI-Spec/issues/1065
+
             req.xapi.get(next, config);
         };
 
@@ -206,9 +206,9 @@ if ((typeof module !== 'undefined' && module.exports)) {
                         return null;
                     }
                     conf.query = null;
-                    //TODO
+
                     var parts = more.split('/statements');
-                    return '/statements' + parts[parts.length - 1]; // ADL more, TODO check learninglocker
+                    return '/statements' + parts[parts.length - 1];
                 },
                 // callback for fetching data
                 function(res, conf) {

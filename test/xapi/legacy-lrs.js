@@ -62,6 +62,7 @@ describe('req.xapi cross domain mode', function() {
 
     const registration = req.xapi.uuid();
     const statementIds = []; //array of statement.ids
+    const now = new Date();
 
     const createStatement = (activitySuffix, id) => {
         id = id || null;
@@ -115,7 +116,7 @@ describe('req.xapi cross domain mode', function() {
                 always: function(res, ins) {
                     assert.strictEqual(res.status, 204, 'response status: 204');
                     assert.strictEqual(res.data, '', 'body of a PUT call is empty');
-                    done();
+                    setTimeout(done, 500);
                 }
             }
         );
@@ -148,7 +149,7 @@ describe('req.xapi cross domain mode', function() {
                     assert.strictEqual(Object.prototype.toString.call(res.data), '[object Array]', 'is an array');
                     assert.strictEqual(res.data.length, 1, 'has 1 element');
                     assert.strictEqual(res.data[0], id, 'returns submitted statementId');
-                    done();
+                    setTimeout(done, 500);
                 }
             }
         );
@@ -180,18 +181,65 @@ describe('req.xapi cross domain mode', function() {
                     assert.strictEqual(res.status, 200, 'response status: 200');
                     assert.strictEqual(Object.prototype.toString.call(res.data), '[object Object]', 'is an object');
                     assert.strictEqual(Object.prototype.toString.call(res.data.statements), '[object Array]', 'is an array');
-                    assert.strictEqual(res.data.statements[0].id, statementIds[0], 'first statement has id ' + statementIds[0]);
-                    assert.strictEqual(res.data.statements[1].id, statementIds[1], 'first statement has id ' + statementIds[1]);
-                    done();
+                    assert.strictEqual(res.data.statements[0].id, statementIds[0], 'first statement has id ' + statementIds[0] + ', not ' + statementIds[1]);
+                    assert.strictEqual(res.data.statements[1].id, statementIds[1], 'first statement has id ' + statementIds[1] + ', not ' + statementIds[0]);
+                    setTimeout(done, 500);
                 }
             }
         );
 
     });
+    // @see https://github.com/adlnet/xAPI-Spec/issues/1065
+    xit('req.xapi.statements() aggregation: legacy', function(done) {
+
+        let firstReq = false;
+        let count = 0;
+
+        req.xapi.statements({
+            query: {
+                since: now.toISOString(),
+                limit: 1, // 2 smts being sent before
+                registration: registration
+            },
+            transformRequest: function(config) {
+                assert.strictEqual(config.headers['Content-Type'], 'application/x-www-form-urlencoded', 'request method was transformed to POST');
+                assert.strictEqual(config.method, 'POST', 'request method was transformed to POST');
+                assert.strictEqual(config.query.method, 'GET', 'initial request method attached as query param `method`');
+
+                if (firstReq) {
+                    let search;
+                    search = new RegExp('since=' + encodeURIComponent(now.toISOString()));
+                    assert.strictEqual(search.test(config.data), true, 'attaches query param "since" to data body');
+                    search = new RegExp('limit=1');
+                    assert.strictEqual(search.test(config.data), true, 'attaches query param "limit" to data body');
+                    search = new RegExp('registration=' + registration);
+                    assert.strictEqual(search.test(config.data), true, 'attaches query param "limit" to data body');
+
+                    firstReq = false;
+                }
+            },
+            success: function(result) {
+                assert.strictEqual(result.status, 200, 'response status: 200');
+                assert.strictEqual(Object.prototype.toString.call(result.data.statements), '[object Array]', 'is an array');
+                assert.strictEqual(result.data.statements.length, 2, 'has 2 elements');
+                assert.strictEqual(count, 2, 'aggregted in 2 steps');
+                setTimeout(done, 500);
+            },
+            error: function(result) {
+                // bound to fail and display error
+                assert.strictEqual(result.status, 'trigger error', 'the aggregation request was rejected with status ' + result.status);
+                setTimeout(done, 500);
+            },
+            always: function(result) {
+                count++;
+            }
+        });
+
+    });
 
 });
 
-describe('req.xapi promise', function() {
+describe('req.xapi promise, legacy', function() {
 
     before(beforeSpec);
 
@@ -204,35 +252,6 @@ describe('req.xapi promise', function() {
         req.xapi.LEGACY = false;
         done();
     });
-
-    const createStatements = (length, registration) => {
-        const smts = [];
-        for (let i = 0; i < length; i++) {
-            smts.push({
-                actor: {
-                    mbox: 'mailto:anonymous@lxhive.com'
-                },
-                verb: {
-                    id: 'http://adlnet.gov/expapi/verbs/attempted'
-                },
-                object: {
-                    id: 'http://lxhive.com/activities/lrs-check/' + i
-                },
-                context: {
-                    registration: registration
-                }
-            });
-        }
-        return smts;
-    };
-
-    const batchLength = 10;
-    const queryLimit = 2;
-    const expectedSteps = batchLength / queryLimit;
-
-    const registration = req.xapi.uuid();
-    const now = new Date();
-    let count = 0;
 
     it('GET /statements promise, legacy', function() {
         return req.xapi('/statements', {
@@ -253,72 +272,6 @@ describe('req.xapi promise', function() {
         .then(function(result) {
             assert.strictEqual(result.status, 200);
             assert.strictEqual(typeof (result.data.statements), 'object');
-        })
-        ;
-    });
-
-    it('POST, legacy statements aggregator: promise. legacy', function() {
-        // eslint-disable-next-line no-invalid-this
-        this.timeout(0);
-
-        const statements = createStatements(batchLength, registration);
-        const serialized = encodeURIComponent(JSON.stringify(statements));
-
-        return req.xapi('/statements', {
-            method: 'POST',
-            data: statements,
-            promise: true,
-            transformRequest: function(config) {
-                assert.strictEqual(config.headers['Content-Type'], 'application/x-www-form-urlencoded', 'request method was transformed to POST');
-                assert.strictEqual(config.method, 'POST', 'request method was transformed to POST');
-                assert.strictEqual(config.query.method, 'POST', 'initial request method attached as query param `method`');
-
-                let search;
-                search = new RegExp('content=' + serialized);
-                assert.strictEqual(search.test(config.data), true, 'attaches statements to body.content');
-            }
-        })
-        .then(function(result) {
-            assert.strictEqual(result.status, 200, 'response status: 200');
-            assert.strictEqual(result.data.length, batchLength, 'has ' + batchLength + ' elements');
-
-            count = 0;
-            let firstReq = true;
-
-            return req.xapi.statements({
-                promise: true,
-                query: {
-                    since: now.toISOString(),
-                    limit: queryLimit,
-                    registration: registration
-                },
-                transformRequest: function(config) {
-
-                    assert.strictEqual(config.headers['Content-Type'], 'application/x-www-form-urlencoded', 'request method was transformed to POST');
-                    assert.strictEqual(config.method, 'POST', 'request method was transformed to POST');
-                    assert.strictEqual(config.query.method, 'GET', 'initial request method attached as query param `method`');
-                    if (firstReq) {
-                        let search;
-                        search = new RegExp('since=' + encodeURIComponent(now.toISOString()));
-                        assert.strictEqual(search.test(config.data), true, 'attaches query param "since" to data body');
-                        search = new RegExp('limit=' + queryLimit);
-                        assert.strictEqual(search.test(config.data), true, 'attaches query param "limit" to data body');
-                        search = new RegExp('registration=' + registration);
-                        assert.strictEqual(search.test(config.data), true, 'attaches query param "limit" to data body');
-
-                        firstReq = false;
-                    }
-                },
-                always: function(result) {
-                    count++;
-                }
-            });
-        })
-        .then(function(result) {
-            assert.strictEqual(result.status, 200, 'response status: 200');
-            assert.strictEqual(Object.prototype.toString.call(result.data.statements), '[object Array]', 'is an array');
-            assert.strictEqual(result.data.statements.length, batchLength, 'has ' + batchLength + ' elements');
-            assert.strictEqual(count, expectedSteps, 'aggregted in ' + expectedSteps + ' steps');
         })
         ;
     });

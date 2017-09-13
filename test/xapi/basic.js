@@ -62,7 +62,7 @@ describe('xapi basic' , function() {
         // make sure the test is valid
         it('GET /about: makes sure the LRS is present', function(done) {
             assert.strictEqual(result.status, 200, 'response status: 200');
-            done();
+            setTimeout(done, 500);
         });
 
     });
@@ -95,7 +95,7 @@ describe('xapi basic' , function() {
             assert.strictEqual(result.status, 200, 'response status: 200');
             assert.strictEqual(Object.prototype.toString.call(result.data), '[object Array]', 'is an array');
             assert.strictEqual(result.data.length, 1, 'has 1 element');
-            done();
+            setTimeout(done, 500);
         });
 
     });
@@ -131,7 +131,7 @@ describe('xapi basic' , function() {
             assert.strictEqual(result.status, 200, 'response status: 200');
             assert.strictEqual(Object.prototype.toString.call(result.data), '[object Array]', 'is an array');
             assert.strictEqual(result.data.length, 2, 'has 1 element');
-            done();
+            setTimeout(done, 500);
         });
 
     });
@@ -161,7 +161,7 @@ describe('xapi basic' , function() {
 
         it('PUT /statements: write 1 statement to LRS', function(done) {
             assert.strictEqual(result.status, 204, 'response status: 204');
-            done();
+            setTimeout(done, 500);
         });
 
     });
@@ -190,7 +190,7 @@ describe('xapi basic' , function() {
             assert.strictEqual(result.status, 200, 'response status: 200');
             assert.strictEqual(Object.prototype.toString.call(result.data.statements), '[object Array]', 'is an array');
             assert.strictEqual(result.data.statements.length, created, 'has ' + created + ' elements');
-            done();
+            setTimeout(done, 500);
         });
 
     });

@@ -451,6 +451,7 @@ var req = (function() {
     exports.raw = function(url, config) {
         return request(url, config);// note the order of merge. default overwrites are allowed
     };
+
     exports.get = function(url, config) {
         return request(url, config);
     };
