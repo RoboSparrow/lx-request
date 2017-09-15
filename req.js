@@ -7,7 +7,9 @@ var req = (function() {
 
     'use strict';
 
-    var exports = {};
+    var settings = {
+        ASYNC: 'callback'
+    };
 
     //// check node or browser
     // note that bundler like webpack might have both window and commonJS module
@@ -26,7 +28,7 @@ var req = (function() {
     }
 
     // checks ES6 promise support and attaches native Promise, can be substituted
-    exports.Promise = (typeof Promise !== 'function') ? function() {
+    settings.Promise = (typeof Promise !== 'function') ? function() {
         throw new Error('"promise" flag was set in request config but the system doesn\'t support ES6 Promise, use callbacks instead.');
     } : Promise;
 
@@ -466,9 +468,10 @@ var req = (function() {
         }
 
         var fn = (NODE) ? _httpRequest : _xhrRequest;
+        var p = (config.promise === true || settings.ASYNC === 'promise');
 
-        if (config.promise === true) {
-            return new exports.Promise(function(resolve, reject) {
+        if (p) {
+            return new settings.Promise(function(resolve, reject) {
                 config.success = function(data) {
                     resolve(data);
                 };
@@ -482,6 +485,17 @@ var req = (function() {
         return fn(url, config);
     };
 
+    ////
+    //  export
+    ////
+    var exports = settings;
+
+    exports.extend = extend;
+    exports.mergeDefaults = mergeDefaults;
+    exports.serializeParams = encodeData;
+
+    exports.request = request;
+
     //// json request
     exports.json = function(url, config) {
         var defaults = {
@@ -492,16 +506,6 @@ var req = (function() {
         };
         return request(url, mergeDefaults(defaults, config));// note the order of merge. default overwrites are allowed
     };
-
-    ////
-    //  export
-    ////
-
-    exports.extend = extend;
-    exports.mergeDefaults = mergeDefaults;
-    exports.serializeParams = encodeData;
-
-    exports.request = request;
 
     //// raw request
     exports.raw = function(url, config) {

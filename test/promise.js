@@ -29,6 +29,11 @@ describe('promise', function() {
         });
     });
 
+    it('req.ASYNC configuration is set to "callback"', function(done) {
+        assert.strictEqual(req.ASYNC, 'req.ASYNC === callback');
+        done();
+    });
+
     it('request should return an instance of Promise', function() {
         const ref = Object.prototype.toString.call(Promise.resolve());
         const ins = req.request(url + '/200', {
