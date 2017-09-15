@@ -6,7 +6,7 @@ x xapi legacy & req.application/x-www-form-urlencoded
 * xapi statements: cap
 x xapi switch lrs config for single calls
 - global promise option
-- req.form
+- req.form, req plain, what to do with req.raw?
 - debug mode: response with config, url & benchmark millisec
 - accept headers
 x req.mergeHash rewrite

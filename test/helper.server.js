@@ -10,9 +10,10 @@ const server = (() => {
     return http.createServer(function(request, response) {
 
         const url = Url.parse(request.url);
+        let extname = path.extname(url.pathname).toLowerCase();
+
         const name = path.basename(url.pathname, extname);
         const dirname = path.dirname(url.pathname);
-        let extname = path.extname(url.pathname).toLowerCase();
 
         const isXapi = /\/xapi/ig.test(dirname);
 
