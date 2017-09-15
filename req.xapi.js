@@ -145,7 +145,7 @@ if ((typeof module !== 'undefined' && module.exports)) {
         // merge config and re-attach xapi for debug
         // note it's still possible to overwrite default headers
         // TODO req.DEBUG
-        config = req.mergeHash(defaults(xapi), config);
+        config = req.mergeDefaults(defaults(xapi), config);
         config.xapi = xapi;
 
         // build url

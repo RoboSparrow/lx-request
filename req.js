@@ -58,23 +58,79 @@ var req = (function() {
         return /application\/json/.test(header);
     };
 
-    // Merges two (or more) objects,
-    // @TODO improve
-    var mergeHash = function(destination, source) {
-        var shallowProperties = ['data'];
-        for (var property in source) {
-            if (shallowProperties.indexOf(property) > -1) {
-                destination[property] = source[property];
-                continue;
-            }
-            if (source[property] && source[property].constructor && source[property].constructor === Object) {
-                destination[property] = destination[property] || {};
-                mergeHash(destination[property], source[property]);
-                continue;
-            }
-            destination[property] = source[property];
+
+    var _baseExtendArray = function(targ, arr) {
+
+
+        var l = arr.length;
+        for (var k = 0; k < l; k++) {
+            targ[k] = arr[k];
         }
-        return destination;
+        return targ;
+    };
+
+    /**
+    * extends targObj  with one object or more objects.
+    * mutates first object (targObj)
+    *      extend(targObj, obj1, [obj2...])
+    *      extend(deepFlag, targObj, obj1, [obj2...])
+    *
+    * if deepFlag === true:
+    *      [object Object] properties are deeply merged
+    *      [object Array] properties are flat merged (simply adding/replacing indexes)
+    */
+    var extend = function() {
+        var s = 0;
+        var deep = false;
+        var obj;
+        var val;
+        var src;
+        var length = arguments.length;
+        if (typeof arguments[0] === 'boolean') {
+            s = 1;
+            deep = arguments[0];
+        }
+        src = arguments[s];
+        s += 1;
+        for (var i = s; i < length; i++) {
+            obj = arguments[i];
+            for (var key in obj) {
+                val = obj[key];
+                if (!obj.hasOwnProperty(key)) {
+                    continue;
+                }
+                if (val === undefined) {
+                    continue;
+                }
+                if (!deep) {
+                    src[key] = val;
+                    continue;
+                }
+                if (_isScalar(val)) {
+                    src[key] = val;
+                    continue;
+                }
+                var pType = Object.prototype.toString.call(val);
+                if (pType === '[object Object]') {
+                    // force new assignment
+                    src[key] = extend(deep, src[key] || {}, val);
+                    continue;
+                }
+                if (pType === '[object Array]') {
+                    // force new assignment
+                    src[key] = _baseExtendArray(src[key] || [], val);
+                    continue;
+                }
+                src[key] = val;
+            }
+        }
+
+        return src;
+    };
+
+    var mergeDefaults = function(defaults, config) {
+        defaults.data = undefined;
+        return extend(true, defaults, config);
     };
 
     //// parse urelencoded request body
@@ -401,7 +457,7 @@ var req = (function() {
         };
 
         // merge config with defaults
-        config = mergeHash(defaults, config);
+        config = mergeDefaults(defaults, config);
 
         // encode query params
         var query = _encodeQuery(config);
@@ -412,7 +468,6 @@ var req = (function() {
         var fn = (NODE) ? _httpRequest : _xhrRequest;
 
         if (config.promise === true) {
-
             return new exports.Promise(function(resolve, reject) {
                 config.success = function(data) {
                     resolve(data);
@@ -435,14 +490,15 @@ var req = (function() {
             },
             responseType: 'json'
         };
-        return request(url, mergeHash(defaults, config));// note the order of merge. default overwrites are allowed
+        return request(url, mergeDefaults(defaults, config));// note the order of merge. default overwrites are allowed
     };
 
     ////
     //  export
     ////
 
-    exports.mergeHash = mergeHash;
+    exports.extend = extend;
+    exports.mergeDefaults = mergeDefaults;
     exports.serializeParams = encodeData;
 
     exports.request = request;
