@@ -4,12 +4,13 @@
 * xapi legacy & req.application/x-www-form-urlencoded
 * xapi statements: cap
 * xapi switch lrs config for single calls
+* rewrite defaults merging
 
 0.2.1 security
 
-* xapi.AUTH only accept encoded
 * optimise low-level function (merge, parse etc)
-* mergeConfig: replace config merge with clone (destroy instances)
+* merge replace config merge with clone (destroy instances)
+* prepare es-6 src, build, minification
 * response object - debug options (url, headers)
 * maybe: req support for FormData and FileApi
 * req.DEBUG change mergin ing order of defaukts (overwrite) attach extra Data to response
