@@ -10,9 +10,9 @@ const server = (() => {
     return http.createServer(function(request, response) {
 
         const url = Url.parse(request.url);
+        const name = path.basename(url.pathname, extname);
+        const dirname = path.dirname(url.pathname);
         let extname = path.extname(url.pathname).toLowerCase();
-        let name = path.basename(url.pathname, extname);
-        let dirname = path.dirname(url.pathname);
 
         const isXapi = /\/xapi/ig.test(dirname);
 
@@ -20,12 +20,12 @@ const server = (() => {
             extname = '.json';
         }
 
-        let mimeTypes = {
+        const mimeTypes = {
             '.html': 'text/html',
             '.json': 'application/json'
         };
 
-        let contentType = mimeTypes[extname] || 'text/plain';
+        const contentType = mimeTypes[extname] || 'text/plain';
         let body = '';
 
         response.setHeader('content-type', contentType);
@@ -101,14 +101,14 @@ const server = (() => {
 
 })();
 
-let listen = (port) => {
+const listen = (port) => {
     const url = `http://localhost:${port}`;
     server.listen(port);
     console.log(`Server running at ${url}`);
     return url;
 };
 
-let close = () => {
+const close = () => {
     server.close();
 };
 

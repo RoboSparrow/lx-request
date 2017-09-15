@@ -140,8 +140,7 @@ describe('req.xapi cross domain mode', function() {
                     assert.strictEqual(config.method, 'POST', 'request method was transformed to POST');
                     assert.strictEqual(config.query.method, 'POST', 'initial request method attached as query param `method`');
 
-                    let search;
-                    search = new RegExp('content=' + serialized);
+                    const search = new RegExp('content=' + serialized);
                     assert.strictEqual(search.test(config.data), true, 'attaches statement to body.content');
                 },
                 always: function(res, ins) {
@@ -264,8 +263,7 @@ describe('req.xapi promise, legacy', function() {
                 assert.strictEqual(config.method, 'POST', 'request method was transformed to POST');
                 assert.strictEqual(config.query.method, 'GET', 'initial request method attached as query param `method`');
 
-                let search;
-                search = new RegExp('limit=1');
+                const search = new RegExp('limit=1');
                 assert.strictEqual(search.test(config.data), true, 'attaches query param "limit" to data body');
             }
         })

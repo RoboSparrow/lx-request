@@ -1,9 +1,8 @@
 'use strict';
 
-let server = require('./helper.server');
-let assert = require('assert');
-
-let req = require('../req');
+const server = require('./helper.server');
+const assert = require('assert');
+const req = require('../req');
 
 const beforeSpec = function(done) {
     server.listen(8000);

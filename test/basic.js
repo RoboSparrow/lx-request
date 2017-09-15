@@ -1,9 +1,8 @@
 'use strict';
 
-let server = require('./helper.server');
-let assert = require('assert');
-
-let req = require('../req');
+const server = require('./helper.server');
+const assert = require('assert');
+const req = require('../req');
 
 const beforeSpec = function(done) {
     server.listen(8000);
@@ -121,11 +120,12 @@ describe('Basic test', function() {
 
     // @todo automate and run through any staus code
     it('should NOT trigger ERROR callback when a success status is returned', function(done) {
-        let trigger = {
+        const trigger = {
             success: 0,
             error: 0,
             always: 0
         };
+
         req.request(url + '/204', {
             method: 'PUT',
             data: {
@@ -149,7 +149,7 @@ describe('Basic test', function() {
 
     // @todo automate and run through any staus code
     it('should NOT trigger SUCCSESS callback when an error status is returned', function(done) {
-        let trigger = {
+        const trigger = {
             success: 0,
             error: 0,
             always: 0
