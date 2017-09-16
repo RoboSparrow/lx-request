@@ -320,7 +320,7 @@ var req = (function() {
             }
         }
 
-        var result = new Response(xhr, config);
+        var result = new Response();
         // core
         xhr.onreadystatechange = function() {
 
