@@ -130,7 +130,7 @@ var req = (function() {
         return src;
     };
 
-    var mergeDefaults = function(defaults, config) {
+    var extendDefaults = function(defaults, config) {
         defaults.data = undefined;
         return extend(true, defaults, config);
     };
@@ -459,7 +459,7 @@ var req = (function() {
         };
 
         // merge config with defaults
-        config = mergeDefaults(defaults, config);
+        config = extendDefaults(defaults, config);
 
         // encode query params
         var query = _encodeQuery(config);
@@ -491,7 +491,7 @@ var req = (function() {
     var exports = settings;
 
     exports.extend = extend;
-    exports.mergeDefaults = mergeDefaults;
+    exports.extendDefaults = extendDefaults;
     exports.serializeParams = encodeData;
 
     exports.request = request;
@@ -504,7 +504,7 @@ var req = (function() {
             },
             responseType: 'json'
         };
-        return request(url, mergeDefaults(defaults, config));// note the order of merge. default overwrites are allowed
+        return request(url, extendDefaults(defaults, config));// note the order of merge. default overwrites are allowed
     };
 
     //// raw request
