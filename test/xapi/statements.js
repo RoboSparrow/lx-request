@@ -188,6 +188,38 @@ describe('req.xapi statements aggregation', function() {
 
     });
 
+    describe('req.xapi.statements PROMISE rejection (invalid query)', function() {
+
+        it('req.xapi.statements (promise) on initial rejection it stops the chain', function() {
+            let count = 0;
+
+            req.xapi.statements({
+                promise: true,
+                query: {
+                    agent: 'invalid'
+                },
+                always: function(result) {
+                    count++;
+                }
+            })
+            .then(
+                function(result) {
+                    assert.strictEqual(true, false, 'promise.resolve should not have been called');
+                },
+                function(result) {
+                    assert.strictEqual(result.status, 400, 'response status: 400');
+                    assert.strictEqual(count, 1, 'aggregted in 1 step');
+                }
+            )
+            ;
+        });
+
+        xit('req.xapi.statements (promise) (edge case) a error response from the server within the chain triggers reject()', function() {
+            // inject invalid request in between calls
+        });
+
+    });
+
     describe('req.xapi.statements get many with CAP option', function() {
         // eslint-disable-next-line no-invalid-this
         this.timeout(0);

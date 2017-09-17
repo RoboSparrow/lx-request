@@ -19,6 +19,7 @@ describe('req.xapi promise', function() {
 
     before(beforeSpec);
 
+    /*
     const createStatements = (length, registration) => {
         const smts = [];
         for (let i = 0; i < length; i++) {
@@ -39,6 +40,7 @@ describe('req.xapi promise', function() {
         }
         return smts;
     };
+    */
 
     before(beforeSpec);
 

@@ -229,8 +229,6 @@ if ((typeof module !== 'undefined' && module.exports)) {
     };
 
     req.xapi.statements = function(config, options) {
-
-        // TODO: base default getter on api and move together with promise into search
         // TODO: decide on default cap
         options = req.extend({
             // callback for fetching data
@@ -249,7 +247,6 @@ if ((typeof module !== 'undefined' && module.exports)) {
                 return '/statements' + parts[parts.length - 1];
             }
         }, options);
-
         return search('/statements', config, options);
     };
 

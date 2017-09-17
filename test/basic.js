@@ -148,7 +148,7 @@ describe('Basic test', function() {
     });
 
     // @todo automate and run through any staus code
-    it('should NOT trigger SUCCSESS callback when an error status is returned', function(done) {
+    it('should NOT trigger SUCCESS callback when an error status is returned', function(done) {
         const trigger = {
             success: 0,
             error: 0,
