@@ -3,11 +3,11 @@ x testability/ more url: add run-time overwrite for config.lrs to config
 x eslint, switch to a base template
 x promise support
 x xapi legacy & req.application/x-www-form-urlencoded
-- xapi statements: cap
+x xapi statements: cap
 x xapi switch lrs config for single calls
 x global promise option
 - req.form, req plain, what to do with req.raw?
-- accept headers
+x ~~accept headers~~ leave to client
 x req.mergeHash rewrite
 x ~~req.request(), req.xapi() retain initial config instance ?~~ nope, leave as basic mutation killer
 
