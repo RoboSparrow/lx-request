@@ -11,7 +11,8 @@ if ((typeof module !== 'undefined' && module.exports)) {
 
     'use strict';
 
-    var search = function(api, config, options) {
+    // aggregate helper (callback mode only, see search())
+    var aggregate = function(api, config, options) {
 
         if (typeof options.cap !== 'number') {
             options.cap = -1; // TODO
@@ -23,7 +24,7 @@ if ((typeof module !== 'undefined' && module.exports)) {
 
         var resolve = config.success || function() {};
 
-        var aggregate = function(res) {
+        var mergeData = function(res) {
             if (!response) {
                 response = res;
                 return;
@@ -38,17 +39,17 @@ if ((typeof module !== 'undefined' && module.exports)) {
 
         var success = function(res, ins) {
             next = options.nextFn(res, config);
-            var length = aggregate(res);
+            var length = mergeData(res);
 
             if (!next || next === prev) {
-                // replace data with aggregated data in current response
+                // replace data with merged data in current response
                 res.data = response.data;
                 resolve(res, ins);
                 return;
             }
 
             if (options.cap > -1 && length >= options.cap) {
-                // replace data with aggregated data in current response
+                // replace data with merged data in current response
                 res.data = response.data;
                 resolve(res, ins);
                 return;
@@ -60,6 +61,25 @@ if ((typeof module !== 'undefined' && module.exports)) {
 
         config.success = success;
         req.xapi.get(api, config);
+    };
+
+    var search = function(api, config, options) {
+        var p = (config.promise === true || req.ASYNC === 'promise');
+
+        if (p) {
+            config.promise = false;
+            return new req.Promise(function(resolve, reject) {
+                config.success = function(data) {
+                    resolve(data);
+                };
+                config.error = function(data) {
+                    reject(data);
+                };
+                return aggregate(api, config, options);
+            });
+        }
+
+        return aggregate(api, config, options);
     };
 
     /**
@@ -230,22 +250,7 @@ if ((typeof module !== 'undefined' && module.exports)) {
             }
         }, options);
 
-        var p = config.promise || false;
-
-        if (p) {
-            config.promise = false;
-            return new req.Promise(function(resolve, reject) {
-                config.success = function(data) {
-                    resolve(data);
-                };
-                config.error = function(data) {
-                    reject(data);
-                };
-                search('/statements', config, options);
-            });
-        }
-
-        search('/statements', config, options);
+        return search('/statements', config, options);
     };
 
     ////
