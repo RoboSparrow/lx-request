@@ -11,7 +11,12 @@ if ((typeof module !== 'undefined' && module.exports)) {
 
     'use strict';
 
-    var search = function(api, config, nextFn, dataFn) {
+    var search = function(api, config, options) {
+
+        if (typeof options.cap !== 'number') {
+            options.cap = -1; // TODO
+        }
+
         var response = null;
         var prev = null;
         var next = null;
@@ -23,17 +28,26 @@ if ((typeof module !== 'undefined' && module.exports)) {
                 response = res;
                 return;
             }
-            var oldData = dataFn(response, config);
-            var newData = dataFn(res, config);
+            var oldData = options.dataFn(response, config);
+            var newData = options.dataFn(res, config);
             for (var i = 0; i < newData.length; i++) {
                 oldData.push(newData[i]);
             }
+            return oldData.length;
         };
 
         var success = function(res, ins) {
-            next = nextFn(res, config);
-            aggregate(res);
+            next = options.nextFn(res, config);
+            var length = aggregate(res);
+
             if (!next || next === prev) {
+                // replace data with aggregated data in current response
+                res.data = response.data;
+                resolve(res, ins);
+                return;
+            }
+
+            if (options.cap > -1 && length >= options.cap) {
                 // replace data with aggregated data in current response
                 res.data = response.data;
                 resolve(res, ins);
@@ -145,7 +159,7 @@ if ((typeof module !== 'undefined' && module.exports)) {
         // merge config and re-attach xapi for debug
         // note it's still possible to overwrite default headers
         // TODO req.DEBUG
-        config = req.mergeDefaults(defaults(xapi), config);
+        config = req.extendDefaults(defaults(xapi), config);
         config.xapi = xapi;
 
         // build url
@@ -194,32 +208,32 @@ if ((typeof module !== 'undefined' && module.exports)) {
         return req.xapi(api, config);
     };
 
-    req.xapi.statements = function(config) {
-        var p = config.promise || false;
+    req.xapi.statements = function(config, options) {
 
-        var fn = function() {
-            search('/statements', config,
-                // callback for building parse more url
-                function(res, conf) {
-                    var more = res.data.more || null;
-                    if (!more) {
-                        return null;
-                    }
-                    conf.query = null;
-
-                    var parts = more.split('/statements');
-                    return '/statements' + parts[parts.length - 1];
-                },
-                // callback for fetching data
-                function(res, conf) {
-                    return res.data.statements;
+        // TODO: base default getter on api and move together with promise into search
+        // TODO: decide on default cap
+        options = req.extend({
+            // callback for fetching data
+            dataFn: function(res, conf) {
+                return res.data.statements;
+            },
+            // callback for building parse more url
+            nextFn: function(res, conf) {
+                var more = res.data.more || null;
+                if (!more) {
+                    return null;
                 }
-            );
-        };
+                conf.query = null;
+
+                var parts = more.split('/statements');
+                return '/statements' + parts[parts.length - 1];
+            }
+        }, options);
+
+        var p = config.promise || false;
 
         if (p) {
             config.promise = false;
-
             return new req.Promise(function(resolve, reject) {
                 config.success = function(data) {
                     resolve(data);
@@ -227,11 +241,11 @@ if ((typeof module !== 'undefined' && module.exports)) {
                 config.error = function(data) {
                     reject(data);
                 };
-                fn();
+                search('/statements', config, options);
             });
         }
 
-        fn();
+        search('/statements', config, options);
     };
 
     ////

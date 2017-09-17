@@ -5,6 +5,7 @@ const assert = require('assert');
 const req = require('../req');
 
 const beforeSpec = function(done) {
+    req.ASYNC = 'callback';//restore
     server.listen(8000);
     done();
 };
@@ -30,7 +31,7 @@ describe('promise', function() {
     });
 
     it('req.ASYNC configuration is set to "callback"', function(done) {
-        assert.strictEqual(req.ASYNC, 'req.ASYNC === callback');
+        assert.strictEqual(req.ASYNC, 'callback', 'req.ASYNC === callback');
         done();
     });
 
