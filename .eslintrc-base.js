@@ -2,7 +2,7 @@
 module.exports = {
     "env": {
         "mocha": true,
-        "es6": true
+        "es6": false
     },
     "rules": {
         // Rules are divided into sections from http://eslint.org/docs/rules/

@@ -60,9 +60,7 @@ var req = (function() {
         return /application\/json/.test(header);
     };
 
-
     var _baseExtendArray = function(targ, arr) {
-
 
         var l = arr.length;
         for (var k = 0; k < l; k++) {
