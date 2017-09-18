@@ -11,8 +11,8 @@ var req = (function() {
         ASYNC: 'callback'
     };
 
-    //// check node or browser
-    // note that bundler like webpack might have both window and commonJS module
+    // check node or browser
+    // - note that bundler like webpack might have both window and commonJS module
     var NODE = (typeof module !== 'undefined' && module.exports);
     if (typeof window !== 'undefined' && window.XMLHttpRequest) {
         /* global window */
@@ -36,32 +36,12 @@ var req = (function() {
     // Utils
     ////
 
-    //// case-insensitive object access (headers!)
-    var objectGet = function(key, obj, ret) {
-        var search = key.toLowerCase();
-        var l;
-        for (var k in obj) {
-            if (obj.hasOwnProperty(k)) {
-                l = k.toLowerCase();
-                if (search === l) {
-                    return obj[k];
-                }
-            }
-        }
-        return (ret === undefined) ? null : ret;
-    };
-
-    //// check config if request is a json request
-    var _isJsonRequest = function(config) {
-        if (config.responseType === 'json') { // xhr
-            return true;
-        }
-        var header = objectGet('Content-Type', config.headers, '');
-        return /application\/json/.test(header);
+    var _isScalar = function(v) {
+        var type = typeof v;
+        return v === null || ['string', 'number', 'boolean'].indexOf(type) > -1;
     };
 
     var _baseExtendArray = function(targ, arr) {
-
         var l = arr.length;
         for (var k = 0; k < l; k++) {
             targ[k] = arr[k];
@@ -124,7 +104,6 @@ var req = (function() {
                 src[key] = val;
             }
         }
-
         return src;
     };
 
@@ -133,7 +112,43 @@ var req = (function() {
         return extend(true, defaults, config);
     };
 
-    //// parse urelencoded request body
+    ////
+    // headers
+    ////
+
+    var setHeaders = function(headers) {
+        var ret = {};
+        var parts;
+        var k;
+        for (var key in headers) {
+            if (headers.hasOwnProperty(key)) {
+                k = '';
+                parts = key.toLowerCase().split('-');
+                for (var i = 0; i < parts.length; i++) {
+                    k += (k) ?  '-' : '';
+                    k += parts[i].charAt(0).toUpperCase() + parts[i].substr(1);
+                }
+                ret[k] = headers[key];
+            }
+        }
+        return ret;
+    };
+
+    // check config if request is a json request
+    // TODO header
+    var _isJsonRequest = function(config) {
+        if (config.responseType === 'json') { // xhr
+            return true;
+        }
+        var header = config.headers['Content-Type'] || '';
+        return (header) ? /application\/json/.test(header) : false;
+    };
+
+    ////
+    // Data
+    ////
+
+    // parse urelencoded request body
     var sendableRawDataFormats = [];
     if (!NODE) {
         sendableRawDataFormats = [
@@ -164,16 +179,15 @@ var req = (function() {
         ];
     }
 
-    var _isScalar = function(v) {
-        var type = typeof v;
-        return v === null || ['string', 'number', 'boolean'].indexOf(type) > -1;
-    };
-
-    //// parse Body
-    // TODO this is problematic:
-    // we should inspect the content-type-header, text/plain, multipart etc and the parse
-    // alternatively provide highlevel helper methods like req.multipart(), req.formdata()
-    // who parse body data and set headers appropriately before this request. in this case json maybe stay here as the most common complex type
+    // parse Body
+    // - TODO this is problematic:
+    // - https://www.w3.org/Protocols/rfc1341/4_Content-Type.html
+    // -- seven standard types: text, multipart, message,  image , audio, video, application: if none set then Content-type: text/plain; charset=us-ascii is assumed
+    // -- available media types: http://www.iana.org/assignments/media-types/media-types.xhtml
+    // --  "If another primary type is to be used for any reason, it must be given a name starting with "X-" to indicate its non-standard status and to avoid any potential conflict with a future official name."
+    // - we should inspect the content-type-header, text/plain, multipart etc and the parse
+    // - alternatively provide highlevel helper methods like req.multipart(), req.formdata()
+    // - who parse body data and set headers appropriately before this request. in this case json maybe stay here as the most common complex type
     var _parseRequestBody = function(config) {
         // TODO if string, return? @ see __parseRawRequestBody
         if (_isJsonRequest(config)) {
@@ -207,7 +221,7 @@ var req = (function() {
         return encodeData(data);
     };
 
-    //// parse JSON
+    // parse JSON
     var _parseResponseBody = function(body, config) {
 
         if (!body || body === undefined) {
@@ -225,11 +239,11 @@ var req = (function() {
         return body;
     };
 
-    //// encode a javascript object into a query string
-    // TODO merge, review, see https://github.com/angular/angular.js/blob/master/src/ng/http.js#L60 and https://stackoverflow.com/a/30970229
+    // encode a javascript object into a query string
+    // - TODO merge, review, see https://github.com/angular/angular.js/blob/master/src/ng/http.js#L60 and https://stackoverflow.com/a/30970229
     var encodeData = function(obj, prefix) {
         if (Object.prototype.toString.call(obj) === '[object Array]') {
-            obj = obj.reduce(function(o, v, i) {
+            obj = obj.reduce(function(o, v, i) {// TODO >= ie9
                 o[i] = v;
                 return o;
             }, {});
@@ -245,8 +259,8 @@ var req = (function() {
         return str.join('&');
     };
 
-    //// encode a javascript object into a query string
-    // TODO merge with above
+    // encode a javascript object into a query string
+    // - TODO merge with above
     var _encodeQuery = function(config) {
         var str = [];
         var obj = config.query;
@@ -266,7 +280,7 @@ var req = (function() {
     };
 
     ////
-    // response
+    // Response
     ////
 
     var Response = function() {
@@ -305,7 +319,7 @@ var req = (function() {
     // request
     ////
 
-    //// XHR request
+    // XHR request
     var _xhrRequest = function(url, config) {
 
         var xhr = new XMLHttpRequest();
@@ -345,7 +359,7 @@ var req = (function() {
             }
         };
 
-        //catches cors requests
+        // catches cors requests
         xhr.onerror = function(error) {
             result.error = error;
         };
@@ -353,6 +367,7 @@ var req = (function() {
         var data = null;
         if (config.data) {
             data = _parseRequestBody(config);
+            //TODO options.headers['Content-Length'] = bytelength;
         }
 
         if (typeof config.transformRequest === 'function') {
@@ -383,7 +398,7 @@ var req = (function() {
 
         if (config.data) {
             data = _parseRequestBody(config);
-            options.headers['content-length'] = Buffer.byteLength(data);
+            options.headers['Content-Length'] = Buffer.byteLength(data);
         }
 
         if (typeof config.transformRequest === 'function') {
@@ -458,6 +473,8 @@ var req = (function() {
 
         // merge config with defaults
         config = extendDefaults(defaults, config);
+        // normalize headers
+        config.headers = setHeaders(config.headers);
 
         // encode query params
         var query = _encodeQuery(config);
@@ -486,6 +503,7 @@ var req = (function() {
     ////
     //  export
     ////
+
     var exports = settings;
 
     exports.extend = extend;
@@ -494,7 +512,7 @@ var req = (function() {
 
     exports.request = request;
 
-    //// json request
+    // json request
     exports.json = function(url, config) {
         var defaults = {
             headers: {
@@ -505,7 +523,7 @@ var req = (function() {
         return request(url, extendDefaults(defaults, config));// note the order of merge. default overwrites are allowed
     };
 
-    //// raw request
+    // raw request
     exports.raw = function(url, config) {
         return request(url, config);// note the order of merge. default overwrites are allowed
     };
@@ -550,7 +568,7 @@ var req = (function() {
     return exports;
 })();
 
-//// node
+// node
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = req;
 }

@@ -114,7 +114,7 @@ if ((typeof module !== 'undefined' && module.exports)) {
             sData.push('content=' + encodeURIComponent(json));
         }
 
-        //// transform config
+        // transform config
         config.responseType = '';
         config.headers = {
             'Content-Type': 'application/x-www-form-urlencoded' //content-length is added by raw
@@ -177,8 +177,8 @@ if ((typeof module !== 'undefined' && module.exports)) {
         config.xapi = undefined; // overwrite temporarily
 
         // merge config and re-attach xapi for debug
-        // note it's still possible to overwrite default headers
-        // TODO req.DEBUG
+        // - note it's still possible to overwrite default headers
+        // - TODO req.DEBUG
         config = req.extendDefaults(defaults(xapi), config);
         config.xapi = xapi;
 
@@ -291,7 +291,7 @@ if ((typeof module !== 'undefined' && module.exports)) {
 
 })(req);
 
-//// node
+// node
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = req;
 }
