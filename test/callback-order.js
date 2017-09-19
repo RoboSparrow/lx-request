@@ -29,13 +29,17 @@ describe('Callback sequence order', function() {
         });
     });
 
-    it('should follow the callback order for a successful (200) request', function(done) {
+    it('should follow the callback order for a successful (200) GET request', function(done) {
         const called = [];
         const expected = ['transformRequest', 'transformResponse', 'success', 'always'];
         req.request(
             url + '/200',
             {
                 method: 'GET',
+                serialize: function(data) {
+                    called.push('serialize');// should not be called here
+                    return data;
+                },
                 transformRequest: function(config, options) {
                     called.push('transformRequest');
                 },
@@ -43,7 +47,7 @@ describe('Callback sequence order', function() {
                     called.push('transformResponse');
                 },
                 error: function() {
-                    called.push('error');
+                    called.push('error'); // should not be called here
                 },
                 success: function() {
                     called.push('success');
@@ -52,34 +56,24 @@ describe('Callback sequence order', function() {
                     called.push('always');
 
                     assert.strictEqual(res.status, 200, 'response status: 200');
-
-                    let s;
-                    s = 'transformRequest';
-                    assert.strictEqual(called.indexOf(s), expected.indexOf(s), s + '() was called on index ' + expected.indexOf(s));
-                    s = 'success';
-                    assert.strictEqual(called.indexOf(s), expected.indexOf(s), s + '() was called on index ' + expected.indexOf(s));
-                    s = 'always';
-                    assert.strictEqual(called.indexOf(s), expected.indexOf(s), s + '() was called on index ' + expected.indexOf(s));
-
-                    // special
-                    assert.strictEqual(called.length, expected.length, 'the number of called callbacks mathches the number of ecpected callbacks.');
-                    assert.strictEqual(called.indexOf('transformRequest'), expected.indexOf('transformRequest'), 'transformRequest() was called first');
-                    assert.strictEqual(called.indexOf('error'), expected.indexOf('error'), 'error() was not called');
-                    assert.strictEqual(called.indexOf('always'), expected.length - 1, 'always() was called last');
-
+                    assert.strictEqual(called.toString(), expected.toString(), 'callbacks were called in the exact order of: ' + expected.toString());
                     done();
                 }
             }
         );
     });
 
-    it('should follow the callback for an errornous (400) request', function(done) {
+    it('should follow the callback for an errornous (400) GET request', function(done) {
         const called = [];
         const expected = ['transformRequest', 'transformResponse', 'error', 'always'];
         req.request(
             url + '/400',
             {
                 method: 'GET',
+                serialize: function(data) {
+                    called.push('serialize');// should not be called here
+                    return data;
+                },
                 transformRequest: function(config, options) {
                     called.push('transformRequest');
                 },
@@ -90,27 +84,83 @@ describe('Callback sequence order', function() {
                     called.push('error');
                 },
                 success: function() {
-                    called.push('success');
+                    called.push('success'); //should not be called here
                 },
                 always: function(res, ins) {
                     called.push('always');
 
                     assert.strictEqual(res.status, 400, 'response status: 400');
+                    assert.strictEqual(called.toString(), expected.toString(), 'callbacks were called in the exact order of: ' + expected.toString());
+                    done();
+                }
+            }
+        );
+    });
 
-                    let s;
-                    s = 'transformRequest';
-                    assert.strictEqual(called.indexOf(s), expected.indexOf(s), s + '() was called on index ' + expected.indexOf(s));
-                    s = 'error';
-                    assert.strictEqual(called.indexOf(s), expected.indexOf(s), s + '() was called on index ' + expected.indexOf(s));
-                    s = 'always';
-                    assert.strictEqual(called.indexOf(s), expected.indexOf(s), s + '() was called on index ' + expected.indexOf(s));
+    it('should follow the callback order for a successful (204) data (PUT) request', function(done) {
+        const called = [];
+        const expected = ['serialize', 'transformRequest', 'transformResponse', 'success', 'always'];
+        req.request(
+            url + '/204',
+            {
+                method: 'PUT',
+                data: 'data',
+                serialize: function(data) {
+                    called.push('serialize');
+                    return data;
+                },
+                transformRequest: function(config, options) {
+                    called.push('transformRequest');
+                },
+                transformResponse: function(config, options) {
+                    called.push('transformResponse');
+                },
+                error: function() {
+                    called.push('error');// should bnot be called here
+                },
+                success: function() {
+                    called.push('success');
+                },
+                always: function(res, ins) {
+                    called.push('always');
 
-                    // special
-                    assert.strictEqual(called.length, expected.length, 'the number of called callbacks mathches the number of ecpected callbacks.');
-                    assert.strictEqual(called.indexOf('transformRequest'), expected.indexOf('transformRequest'), 'transformRequest() was called first');
-                    assert.strictEqual(called.indexOf('success'), expected.indexOf('success'), 'success() was not called');
-                    assert.strictEqual(called.indexOf('always'), expected.length - 1, 'always() was called last');
+                    assert.strictEqual(res.status, 204, 'response status: 204');
+                    assert.strictEqual(called.toString(), expected.toString(), 'callbacks were called in the exact order of: ' + expected.toString());
+                    done();
+                }
+            }
+        );
+    });
 
+    it('should follow the callback order for anrrornous (400) data (PUT) request', function(done) {
+        const called = [];
+        const expected = ['serialize', 'transformRequest', 'transformResponse', 'error', 'always'];
+        req.request(
+            url + '/400',
+            {
+                method: 'PUT',
+                data: 'data',
+                serialize: function(data) {
+                    called.push('serialize');
+                    return data;
+                },
+                transformRequest: function(config, options) {
+                    called.push('transformRequest');
+                },
+                transformResponse: function(config, options) {
+                    called.push('transformResponse');
+                },
+                error: function() {
+                    called.push('error');
+                },
+                success: function() {
+                    called.push('success');// should bnot be called here
+                },
+                always: function(res, ins) {
+                    called.push('always');
+
+                    assert.strictEqual(res.status, 400, 'response status: 400');
+                    assert.strictEqual(called.toString(), expected.toString(), 'callbacks were called in the exact order of: ' + expected.toString());
                     done();
                 }
             }
