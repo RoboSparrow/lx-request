@@ -86,7 +86,6 @@ if ((typeof module !== 'undefined' && module.exports)) {
      * for details @see ./test/xapi/legacy.js
      */
     var transformRequestLegacy = function(config, queryString) {
-
         // responseType
         queryString = queryString || '';
         var method = config.method || 'GET';
@@ -115,7 +114,7 @@ if ((typeof module !== 'undefined' && module.exports)) {
         }
 
         // transform config
-        config.preset = 'form';
+        config.preset = '';
         config.query = {
             method: method
         };
@@ -151,7 +150,6 @@ if ((typeof module !== 'undefined' && module.exports)) {
     var defaults = function(xapi) {
         return {
             headers: {
-                'Content-Type'             : 'application/json',
                 'Authorization'            : xapi.auth,
                 'X-Experience-API-Version' : xapi.version
             },
@@ -185,7 +183,10 @@ if ((typeof module !== 'undefined' && module.exports)) {
         if (config.xapi.legacy) {
             var parts = url.split('?');
             config = transformRequestLegacy(config, parts[1]);
-            return req.raw(parts[0], config);
+            return req.form(parts[0], config);
+            // TODO lxhive issue workaround
+            // config.headers['Content-Type'] = 'application/x-www-form-urlencoded';
+            // return req.request(parts[0], config);
         }
 
         return req.request(url, config);// note the order of merge. default overwrites are allowed
