@@ -116,8 +116,9 @@ var req = (function() {
     // headers
     ////
 
-    var setHeaders = function(headers) {
-        var ret = {};
+    var normalizeHeaders = function(config) {
+        var headers = config.headers;
+        var normalized = {};
         var parts;
         var k;
         for (var key in headers) {
@@ -128,24 +129,14 @@ var req = (function() {
                     k += (k) ?  '-' : '';
                     k += parts[i].charAt(0).toUpperCase() + parts[i].substr(1);
                 }
-                ret[k] = headers[key];
+                normalized[k] = headers[key];
             }
         }
-        return ret;
-    };
-
-    // check config if request is a json request
-    // TODO header
-    var _isJsonRequest = function(config) {
-        if (config.responseType === 'json') { // xhr
-            return true;
-        }
-        var header = config.headers['Content-Type'] || '';
-        return (header) ? /application\/json/.test(header) : false;
+        config.headers = normalized;
     };
 
     ////
-    // Data
+    // Data serialization
     ////
 
     // parse urelencoded request body
@@ -179,66 +170,6 @@ var req = (function() {
         ];
     }
 
-    // parse Body
-    // - TODO this is problematic:
-    // - https://www.w3.org/Protocols/rfc1341/4_Content-Type.html
-    // -- seven standard types: text, multipart, message,  image , audio, video, application: if none set then Content-type: text/plain; charset=us-ascii is assumed
-    // -- available media types: http://www.iana.org/assignments/media-types/media-types.xhtml
-    // --  "If another primary type is to be used for any reason, it must be given a name starting with "X-" to indicate its non-standard status and to avoid any potential conflict with a future official name."
-    // - we should inspect the content-type-header, text/plain, multipart etc and the parse
-    // - alternatively provide highlevel helper methods like req.multipart(), req.formdata()
-    // - who parse body data and set headers appropriately before this request. in this case json maybe stay here as the most common complex type
-    var _parseRequestBody = function(config) {
-        // TODO if string, return? @ see __parseRawRequestBody
-        if (_isJsonRequest(config)) {
-            // TODO overwrite content type header
-            try {
-                return JSON.stringify(config.data);
-            } catch (e) {
-                //@TODO
-                console.error('parseRequestBody; Failed to parse request JSON: ' + e.message);
-            }
-            return config.data;
-        }
-        return _parseRawRequestBody(config.data);
-    };
-
-    var _parseRawRequestBody = function(data) {
-        // string: we assume it was encoded already
-        if (typeof data  === 'string') {
-            return data;
-        }
-        // other primitives
-        if (typeof data  !== 'object') {
-            return encodeURIComponent(data);
-        }
-        // TODO optimise
-        var _type = Object.prototype.toString.call(data);
-        if (sendableRawDataFormats.indexOf(_type) > -1) {
-            return data;
-        }
-
-        return encodeData(data);
-    };
-
-    // parse JSON
-    var _parseResponseBody = function(body, config) {
-
-        if (!body || body === undefined) {
-            return body;
-        }
-
-        if (config.responseType === 'json') {
-            try {
-                return JSON.parse(body);
-            } catch (e) {
-                //@TODO
-                console.error('_parseResponseBody: Failed to parse response JSON: ' + e.message);
-            }
-        }
-        return body;
-    };
-
     // encode a javascript object into a query string
     // - TODO merge, review, see https://github.com/angular/angular.js/blob/master/src/ng/http.js#L60 and https://stackoverflow.com/a/30970229
     var encodeData = function(obj, prefix) {
@@ -266,7 +197,7 @@ var req = (function() {
         var obj = config.query;
         var val;
 
-        if (!_isJsonRequest(config)) {
+        if (config.type !== 'json') {
             return encodeData(obj);// if deep nested obj php-like query
         }
 
@@ -277,6 +208,77 @@ var req = (function() {
             }
         }
         return str.join('&');
+    };
+
+    // parse Body
+    // - TODO this is problematic:
+    // - https://www.w3.org/Protocols/rfc1341/4_Content-Type.html
+    // -- seven standard types: text, multipart, message,  image , audio, video, application: if none set then Content-type: text/plain; charset=us-ascii is assumed
+    // -- available media types: http://www.iana.org/assignments/media-types/media-types.xhtml
+    // --  "If another primary type is to be used for any reason, it must be given a name starting with "X-" to indicate its non-standard status and to avoid any potential conflict with a future official name."
+    // - we should inspect the content-type-header, text/plain, multipart etc and the parse
+    // - alternatively provide highlevel helper methods like req.multipart(), req.formdata()
+    // - who parse body data and set headers appropriately before this request. in this case json maybe stay here as the most common complex type
+
+    var Serializer = {
+
+        json: function(data) {
+            try {
+                return JSON.stringify(data);
+            } catch (e) {
+                //@TODO DEBUG, log error, production throw
+                throw Error('Serializer.json: Failed to stringify JSON: ' + e.message);
+            }
+        },
+
+        form: function(data) {
+            // string: we assume it was encoded already
+            if (typeof data  === 'string') {
+                return data;
+            }
+            // other primitives
+            if (_isScalar(data)) {
+                return encodeURIComponent(data);
+            }
+            // TODO optimise
+            var _type = Object.prototype.toString.call(data);
+            if (sendableRawDataFormats.indexOf(_type) > -1) {
+                throw Error('Serializer.form: Cannot encode data of type ' + _type);
+            }
+
+            return encodeData(data);
+        },
+
+        plain: function(data) {
+            if (typeof data !== 'string') {
+                throw Error('Serializer.plain: String required');
+            }
+            return data;
+        },
+
+        raw: function(data) {
+            // nothing, use at own risk
+            return data;
+        }
+    };
+
+    // parse JSON
+    var _parseResponseBody = function(body, config) {
+
+        if (!body || body === undefined) {
+            return body;
+        }
+
+        if (config.type === 'json') {
+            try {
+                return JSON.parse(body);
+            } catch (e) {
+                //@TODO thow? Response.error? leave Response.data=null?
+                console.error('_parseResponseBody: Failed to parse response JSON: ' + e.message);
+            }
+        }
+        // everything else than json
+        return body;
     };
 
     ////
@@ -366,7 +368,7 @@ var req = (function() {
 
         var data = null;
         if (config.data) {
-            data = _parseRequestBody(config);
+            data = config.serialize(config.data);
             //TODO options.headers['Content-Length'] = bytelength;
         }
 
@@ -397,7 +399,7 @@ var req = (function() {
         };
 
         if (config.data) {
-            data = _parseRequestBody(config);
+            data = config.serialize(config.data);
             options.headers['Content-Length'] = Buffer.byteLength(data);
         }
 
@@ -450,6 +452,77 @@ var req = (function() {
         return null;
     };
 
+    // TODO move
+    // TODO charset global option
+    // - https://xhr.spec.whatwg.org/
+
+    var applyConfig = function(config) {
+
+        var preset = config.preset;
+        var type = (preset) ? preset : 'none';
+        var serializer;
+
+        // if preset, set (and overwrite!) headers header and choose default serializer callback
+        switch (type) {
+            case 'json': {
+                config.headers['Content-Type'] = 'application/json; charset=utf-8';
+                config.headers['Accept'] = 'application/json, text/plain, */*';
+                config.headers['Accept-Charset'] = 'utf-8';
+                serializer = Serializer.json;
+                break;
+            }
+
+            case 'form': {
+                config.headers['Content-Type'] = 'application/x-www-form-urlencoded; charset=utf-8';
+                config.headers['Accept'] = 'application/x-www-form-urlencoded, text/plain, */*';
+                config.headers['Accept-Charset'] = 'utf-8';
+                serializer = Serializer.form;
+                break;
+            }
+
+            case 'plain': {
+                config.headers['Content-Type'] = 'text/plain; charset=utf-8';
+                config.headers['Accept'] = 'text/plain, */*';
+                config.headers['Accept-Charset'] = 'utf-8';
+                serializer = Serializer.plain;
+                break;
+            }
+
+            case 'raw': {
+                serializer =  Serializer.raw;
+                break;
+            }
+
+            // if no preset, inspect content-type header and set serializer callback
+            default: {
+
+                var header = config.headers['Content-Type'] || '';
+
+                if (/application\/x-www-form-urlencoded/i.test(header)) {
+                    serializer = Serializer.form;
+                    break;
+                }
+
+                if (/application\/json/i.test(header)) {
+                    serializer = Serializer.json;
+                    break;
+                }
+
+                serializer = 'plain';
+            }
+        }
+
+        // add type as a shorthand lookup
+        config.type = type;
+
+        // set chosen serializer only if no custom serializer was set in config
+        if (typeof config.serialize !== 'function') {
+            config.serialize = serializer;
+        }
+
+        return config;
+    };
+
     ////
     // request api
     ////
@@ -462,8 +535,7 @@ var req = (function() {
             promise: false,
             query: {},
             headers: {},
-            data: null,
-            responseType: '',//?TODO
+            preset: '', // 'json', 'form', 'plain', 'raw'
             transformRequest: false,    // inspect a request who is about to be sent. function(mergedConfig, parsedData, xhrInstance|httpRequestOptions) note that config changes will have no effect
             transformResponse: false,   // function(raw)
             success: function() {},     // (Response, raw)
@@ -474,7 +546,9 @@ var req = (function() {
         // merge config with defaults
         config = extendDefaults(defaults, config);
         // normalize headers
-        config.headers = setHeaders(config.headers);
+        normalizeHeaders(config);
+        //
+        applyConfig(config);
 
         // encode query params
         var query = _encodeQuery(config);
@@ -508,23 +582,31 @@ var req = (function() {
 
     exports.extend = extend;
     exports.extendDefaults = extendDefaults;
-    exports.serializeParams = encodeData;
+    exports.serializeParams = encodeData;//TODO serializer
 
     exports.request = request;
 
-    // json request
+    // application/json request
     exports.json = function(url, config) {
-        var defaults = {
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            responseType: 'json'
-        };
-        return request(url, extendDefaults(defaults, config));// note the order of merge. default overwrites are allowed
+        config.preset = 'json';
+        return request(url, config);// note the order of merge. default overwrites are allowed
     };
 
-    // raw request
+    // application/x-www-form-urlencoded request
+    exports.form = function(url, config) {
+        config.preset = 'form';
+        return request(url, config);// note the order of merge. default overwrites are allowed
+    };
+
+    // text/plain request
+    exports.plain = function(url, config) {
+        config.preset = 'plain';
+        return request(url, config);// note the order of merge. default overwrites are allowed
+    };
+
+    // raw request (everything goes, no serialization)
     exports.raw = function(url, config) {
+        config.preset = 'raw';
         return request(url, config);// note the order of merge. default overwrites are allowed
     };
 

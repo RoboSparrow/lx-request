@@ -115,10 +115,7 @@ if ((typeof module !== 'undefined' && module.exports)) {
         }
 
         // transform config
-        config.responseType = '';
-        config.headers = {
-            'Content-Type': 'application/x-www-form-urlencoded' //content-length is added by raw
-        };
+        config.preset = 'form';
         config.query = {
             method: method
         };
@@ -158,7 +155,7 @@ if ((typeof module !== 'undefined' && module.exports)) {
                 'Authorization'            : xapi.auth,
                 'X-Experience-API-Version' : xapi.version
             },
-            responseType: 'json'
+            preset: 'json'
         };
     };
 
