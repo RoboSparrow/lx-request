@@ -51,7 +51,7 @@ describe('request query parsing', function() {
             always: function(result, response) {
 
                 assert.strictEqual(result.status, 200);
-                assert.strictEqual(result.headers['x-req-content-type'], 'application/json');
+                assert.strictEqual(result.headers['x-req-content-type'], 'application/json; charset=utf-8');
 
                 const search = result.headers['x-req-search'];
                 const expected = '?agent=' + JSON.stringify(agent);
