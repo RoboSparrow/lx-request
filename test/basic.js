@@ -56,6 +56,7 @@ describe('Basic test', function() {
         req.request(url + '/200', {
             method: 'POST',
             data: 'a string',
+            preset: 'raw',
             always: function(result, response) {
                 assert.strictEqual(result.status, 200);
                 assert.strictEqual(result.headers['x-req-method'], 'POST');
@@ -69,6 +70,7 @@ describe('Basic test', function() {
         req.request(url + '/204', {
             method: 'PUT',
             data: 'a string',
+            preset: 'raw',
             always: function(result, response) {
                 assert.strictEqual(result.status, 204);
                 assert.strictEqual(result.headers['x-req-method'], 'PUT');
@@ -96,6 +98,7 @@ describe('Basic test', function() {
             data: {
                 change: 'that'
             },
+            preset: 'json',
             always: function(result, response) {
                 assert.strictEqual(result.status, 204);
                 assert.strictEqual(result.headers['x-req-method'], 'PATCH');
@@ -167,6 +170,55 @@ describe('Basic test', function() {
                 assert.strictEqual(result.status, 400);
                 assert.strictEqual(trigger.success, 0);
                 assert.strictEqual(trigger.error, 1);
+                done();
+            }
+        });
+    });
+
+});
+
+describe('Headers', function() {
+
+    const url = 'http://localhost:8000';
+
+    before(beforeSpec);
+    after(afterSpec);
+
+    it('shoud normalize header names to first letter uppercase and retain the values', function(done) {
+        req.get(url + '/200', {
+            headers: {
+                'X-UPPERCASE': 'UPPER',
+                'x-lowercase': 'lower',
+                'x-MixED-CaSe': 'mixed'
+            },
+            transformRequest: function(config) {
+                assert.strictEqual(config.headers['X-UPPERCASE'], undefined);
+                assert.strictEqual(config.headers['x-lowercase'], undefined);
+                assert.strictEqual(config.headers['x-MixED-CaSe'], undefined);
+
+                assert.strictEqual(config.headers['X-Uppercase'], 'UPPER');
+                assert.strictEqual(config.headers['X-Lowercase'], 'lower');
+                assert.strictEqual(config.headers['X-Mixed-Case'], 'mixed');
+            },
+            always: function(result, response) {
+                assert.strictEqual(result.status, 200);
+                done();
+            }
+        });
+    });
+
+    it('different case headers are treated as one', function(done) {
+        req.get(url + '/200', {
+            headers: {
+                'X-CUSTOM': 'one',
+                'x-custom': 'two'
+            },
+            transformRequest: function(config) {
+                assert.strictEqual(config.headers['X-CUSTOM'], undefined);
+                assert.strictEqual(config.headers['X-Custom'], 'two');
+            },
+            always: function(result, response) {
+                assert.strictEqual(result.status, 200);
                 done();
             }
         });
