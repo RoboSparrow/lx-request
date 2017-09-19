@@ -173,6 +173,7 @@ var req = (function() {
     // encode a javascript object into a query string
     // - TODO merge, review, see https://github.com/angular/angular.js/blob/master/src/ng/http.js#L60 and https://stackoverflow.com/a/30970229
     var encodeData = function(obj, prefix) {
+        prefix = prefix || '';
         if (Object.prototype.toString.call(obj) === '[object Array]') {
             obj = obj.reduce(function(o, v, i) {// TODO >= ie9
                 o[i] = v;
@@ -232,13 +233,9 @@ var req = (function() {
         },
 
         form: function(data) {
-            // string: we assume it was encoded already
-            if (typeof data  === 'string') {
-                return data;
-            }
-            // other primitives
+            // scalars
             if (_isScalar(data)) {
-                return encodeURIComponent(data);
+                return encodeURI(data);
             }
             // TODO optimise
             var _type = Object.prototype.toString.call(data);
@@ -260,6 +257,7 @@ var req = (function() {
             // nothing, use at own risk
             return data;
         }
+
     };
 
     // parse JSON
@@ -498,17 +496,28 @@ var req = (function() {
 
                 var header = config.headers['Content-Type'] || '';
 
+                if (/text\/plain/i.test(header)) {
+                    type = 'plain';
+                    serializer = Serializer.plain;
+                    break;
+                }
+
                 if (/application\/x-www-form-urlencoded/i.test(header)) {
+                    type = 'form';
                     serializer = Serializer.form;
                     break;
                 }
 
                 if (/application\/json/i.test(header)) {
+                    type = 'json';
                     serializer = Serializer.json;
                     break;
                 }
 
-                serializer = 'plain';
+                // if no or empty header is set it defaults to  inimal config "form"
+                config.headers['Content-Type'] = 'application/x-www-form-urlencoded; charset=utf-8';
+                type = 'form';
+                serializer = Serializer.form;
             }
         }
 
@@ -531,11 +540,12 @@ var req = (function() {
 
         // 'raw' in comments below: xhr or http.ClientRequest
         var defaults = {
-            method: 'GET',
-            promise: false,
-            query: {},
-            headers: {},
-            preset: '', // 'json', 'form', 'plain', 'raw'
+            method: 'GET',              // request method //TODO normalize uppercase
+            promise: false,             // return promise or use "success" and "error" calback options. if set to true these callbacks will be ignored
+            query: {},                  // query params object (key, value)
+            headers: {},                // header object (key, value), maybe overwritten by "preset" option
+            preset: '',                 // 'json', 'form', 'plain', 'raw'
+            serialize: false,           // custom serializer function. taking data and returning string
             transformRequest: false,    // inspect a request who is about to be sent. function(mergedConfig, parsedData, xhrInstance|httpRequestOptions) note that config changes will have no effect
             transformResponse: false,   // function(raw)
             success: function() {},     // (Response, raw)
@@ -547,7 +557,7 @@ var req = (function() {
         config = extendDefaults(defaults, config);
         // normalize headers
         normalizeHeaders(config);
-        //
+        // apply request type, presets, set serializer
         applyConfig(config);
 
         // encode query params
@@ -588,29 +598,34 @@ var req = (function() {
 
     // application/json request
     exports.json = function(url, config) {
+        config = config || {};
         config.preset = 'json';
         return request(url, config);// note the order of merge. default overwrites are allowed
     };
 
     // application/x-www-form-urlencoded request
     exports.form = function(url, config) {
+        config = config || {};
         config.preset = 'form';
         return request(url, config);// note the order of merge. default overwrites are allowed
     };
 
     // text/plain request
     exports.plain = function(url, config) {
+        config = config || {};
         config.preset = 'plain';
         return request(url, config);// note the order of merge. default overwrites are allowed
     };
 
     // raw request (everything goes, no serialization)
     exports.raw = function(url, config) {
+        config = config || {};
         config.preset = 'raw';
         return request(url, config);// note the order of merge. default overwrites are allowed
     };
 
     exports.get = function(url, config) {
+        config = config || {};
         return request(url, config);
     };
 
