@@ -57,7 +57,8 @@ const server = (() => {
             if (isXapi) {
                 // legacy mode
                 // @see https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Communication.md#alt-request-syntax
-                if (request.headers['content-type'] === 'application/x-www-form-urlencoded') {
+                var isLegacy = /application\/x-www-form-urlencoded/i.test(request.headers['content-type']);
+                if (isLegacy) {
                     body = querystring.parse(body);
                     if (typeof body.content !== 'undefined') {
                         try {
