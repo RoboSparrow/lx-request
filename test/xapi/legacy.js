@@ -82,7 +82,6 @@ describe('req.xapi cross domain mode', function() {
                 }
             }
         );
-
     });
 
     it('GET /statements: attaches xapi headers to POST body', function(done) {
@@ -104,7 +103,6 @@ describe('req.xapi cross domain mode', function() {
     });
 
     it('PUT /statements: query params other than "method" are attached to body and content ', function(done) {
-
         const data = {test: 'test'};
         const id = req.xapi.uuid();
         req.xapi(

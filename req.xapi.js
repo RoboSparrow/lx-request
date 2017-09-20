@@ -180,9 +180,6 @@ if ((typeof module !== 'undefined' && module.exports)) {
         if (config.xapi.legacy) {
             config = transformRequestLegacy(config);
             return req.form(url, config);
-            // TODO lxhive issue workaround
-            // config.headers['Content-Type'] = 'application/x-www-form-urlencoded';
-            // return req.request(parts[0], config);
         }
 
         return req.request(url, config);// note the order of merge. default overwrites are allowed
