@@ -85,32 +85,27 @@ if ((typeof module !== 'undefined' && module.exports)) {
     /**
      * for details @see ./test/xapi/legacy.js
      */
-    var transformRequestLegacy = function(config, queryString) {
+    var transformRequestLegacy = function(config) {
         // responseType
-        queryString = queryString || '';
         var method = config.method || 'GET';
         var headers = config.headers || null;
         var query = config.query || null;
         var data = config.data || null;
 
-        var sData = [];
-
-        if (queryString) {
-            sData.push(queryString);
-        }
+        var legacyData = {};
 
         if (query) {
-            sData.push(req.serializeParams(query));
+            req.extend(legacyData, query);
         }
 
+        // req.xapi() works with preset 'json' which inserts json header later on. We need to insrt it manully since we will change the preset to form
+        headers['Content-Type'] = 'application/json; charset=utf-8';
         if (headers) {
-            sData.push(req.serializeParams(headers));
+            req.extend(legacyData, headers);
         }
 
         if (data) {
-            var json = JSON.stringify(config.data);
-            sData.push('Content-Length=' + json.length);
-            sData.push('content=' + encodeURIComponent(json));
+            legacyData.content = JSON.stringify(data);
         }
 
         // transform config
@@ -119,6 +114,7 @@ if ((typeof module !== 'undefined' && module.exports)) {
             method: method
         };
         config.method = 'POST';
+
         config.transformResponse = function(response) {
             if (!response.data) {
                 return;
@@ -130,8 +126,9 @@ if ((typeof module !== 'undefined' && module.exports)) {
                 console.error(e);
             }
         };
-        // add sData
-        config.data = sData.join('&');
+
+        // add legacyData
+        config.data = legacyData;
 
         return config;
     };
@@ -181,9 +178,8 @@ if ((typeof module !== 'undefined' && module.exports)) {
         var url = endpoint(xapi.lrs, api);
 
         if (config.xapi.legacy) {
-            var parts = url.split('?');
-            config = transformRequestLegacy(config, parts[1]);
-            return req.form(parts[0], config);
+            config = transformRequestLegacy(config);
+            return req.form(url, config);
             // TODO lxhive issue workaround
             // config.headers['Content-Type'] = 'application/x-www-form-urlencoded';
             // return req.request(parts[0], config);

@@ -92,7 +92,6 @@ describe('req.xapi cross domain mode', function() {
         const id = req.xapi.uuid();
         statementIds.push(id);
         const statement = createStatement('put');
-        const serialized = encodeURIComponent(JSON.stringify(statement));
 
         req.xapi(
             '/statements',
@@ -107,11 +106,8 @@ describe('req.xapi cross domain mode', function() {
                     assert.strictEqual(config.method, 'POST', 'request method was transformed to POST');
                     assert.strictEqual(config.query.method, 'PUT', 'initial request method attached as query param `method`');
 
-                    let search;
-                    search = new RegExp('statementId=' + id);
-                    assert.strictEqual(search.test(config.data), true, 'attaches query param to data body');
-                    search = new RegExp('content=' + serialized);
-                    assert.strictEqual(search.test(config.data), true, 'attaches statement to body.content');
+                    assert.strictEqual(config.data.statementId, id, 'attaches query param to data body');
+                    assert.strictEqual(config.data.content, JSON.stringify(statement), 'attaches statement to body.content');
                 },
                 always: function(res, ins) {
                     assert.strictEqual(res.status, 204, 'response status: 204');
@@ -128,7 +124,6 @@ describe('req.xapi cross domain mode', function() {
         const id = req.xapi.uuid();
         statementIds.push(id);
         const statement = createStatement('post', id);
-        const serialized = encodeURIComponent(JSON.stringify(statement));
 
         req.xapi(
             '/statements',
@@ -140,8 +135,7 @@ describe('req.xapi cross domain mode', function() {
                     assert.strictEqual(config.method, 'POST', 'request method was transformed to POST');
                     assert.strictEqual(config.query.method, 'POST', 'initial request method attached as query param `method`');
 
-                    const search = new RegExp('content=' + serialized);
-                    assert.strictEqual(search.test(config.data), true, 'attaches statement to body.content');
+                    assert.strictEqual(config.data.content, JSON.stringify(statement), 'attaches statement to body.content');
                 },
                 always: function(res, ins) {
                     assert.strictEqual(res.status, 200, 'response status: 200');
@@ -170,11 +164,8 @@ describe('req.xapi cross domain mode', function() {
                     assert.strictEqual(config.method, 'POST', 'request method was transformed to POST');
                     assert.strictEqual(config.query.method, 'GET', 'initial request method attached as query param `method`');
 
-                    let search;
-                    search = new RegExp('registration=' + registration);
-                    assert.strictEqual(search.test(config.data), true, 'attaches query param "registration" to data body');
-                    search = new RegExp('ascending=true');
-                    assert.strictEqual(search.test(config.data), true, 'attaches query param "ascending" to data body');
+                    assert.strictEqual(config.data.registration, registration, 'attaches query param "registration" to data body');
+                    assert.strictEqual(config.data.ascending, true, 'attaches query param "ascending" to data body');
                 },
                 always: function(res, ins) {
                     assert.strictEqual(res.status, 200, 'response status: 200');
@@ -263,8 +254,7 @@ describe('req.xapi promise, legacy', function() {
                 assert.strictEqual(config.method, 'POST', 'request method was transformed to POST');
                 assert.strictEqual(config.query.method, 'GET', 'initial request method attached as query param `method`');
 
-                const search = new RegExp('limit=1');
-                assert.strictEqual(search.test(config.data), true, 'attaches query param "limit" to data body');
+                assert.strictEqual(config.data.limit, 1, 'attaches query param "limit" to data body');
             }
         })
         .then(function(result) {

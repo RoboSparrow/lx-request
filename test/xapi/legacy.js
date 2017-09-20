@@ -72,7 +72,7 @@ describe('req.xapi cross domain mode', function() {
             {
                 method: 'GET',
                 transformRequest: function(config) {
-                    assert.strictEqual(config.headers['Content-Type'], 'application/x-www-form-urlencoded', 'request method was transformed to POST');
+                    assert.strictEqual(config.headers['Content-Type'], 'application/x-www-form-urlencoded; charset=utf-8', 'request method was transformed to POST');
                     assert.strictEqual(config.method, 'POST', 'request method was transformed to POST');
                     assert.strictEqual(config.query.method, 'GET', 'initial request method attached as query param `method`');
                 },
@@ -85,7 +85,7 @@ describe('req.xapi cross domain mode', function() {
 
     });
 
-    it('GET /statements: returns JSON & attaches xapi headers to POST body', function(done) {
+    it('GET /statements: attaches xapi headers to POST body', function(done) {
         req.xapi(
             '/statements',
             {
@@ -93,7 +93,7 @@ describe('req.xapi cross domain mode', function() {
                 always: function(res, ins) {
                     // helper server returns body as received (encoded as JSON)
                     // below assertions imply parsed JSON body who was sucessfuy parsed
-                    assert.strictEqual(res.data['Content-Type'], 'application/json', 'body hast prop "Content-Type":"application/json"');
+                    assert.strictEqual(res.data['Content-Type'], 'application/json; charset=utf-8', 'body hast prop "Content-Type: application/json; charset=utf-8"');
                     assert.strictEqual(res.data['X-Experience-API-Version'], req.xapi.VERSION, 'body hast prop "X-Experience-API-Version"');
                     assert.strictEqual(typeof res.data['Authorization'], 'string', 'body hast prop "Authorization"');
                     done();
