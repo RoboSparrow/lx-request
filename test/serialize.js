@@ -34,7 +34,7 @@ describe('Default serialization', function() {
         req.request(url + '/200', {
             method: 'POST',
             data: body,
-            transformRequest: function(config, data) {
+            beforeSend: function(config, data) {
                 assert.strictEqual(config.headers['Content-Type'], 'application/x-www-form-urlencoded; charset=utf-8');
                 assert.strictEqual(config.preset, '');
                 assert.strictEqual(config.type, 'form'); //!!!
@@ -66,7 +66,7 @@ describe('application/x-www-form-urlencoded', function() {
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             data: body,
-            transformRequest: function(config, data) {
+            beforeSend: function(config, data) {
                 assert.strictEqual(config.preset, '');
                 assert.strictEqual(config.type, 'form');
                 assert.strictEqual(data,  encodeURI(body));
@@ -88,7 +88,7 @@ describe('application/x-www-form-urlencoded', function() {
                 'Content-Type': 'text/plain' // overwrite
             },
             data: body,
-            transformRequest: function(config, data) {
+            beforeSend: function(config, data) {
                 assert.strictEqual(config.headers['Content-Type'], 'application/x-www-form-urlencoded; charset=utf-8');
                 assert.strictEqual(config.preset, 'form');
                 assert.strictEqual(config.type, 'form');
@@ -107,7 +107,7 @@ describe('application/x-www-form-urlencoded', function() {
         req.form(url + '/200', {
             method: 'POST',
             data: body,
-            transformRequest: function(config, data) {
+            beforeSend: function(config, data) {
                 assert.strictEqual(config.headers['Content-Type'], 'application/x-www-form-urlencoded; charset=utf-8');
                 assert.strictEqual(config.preset, 'form');
                 assert.strictEqual(config.type, 'form');
@@ -141,7 +141,7 @@ describe('application/json', function() {
                 'Content-Type': 'application/json'
             },
             data: body,
-            transformRequest: function(config, data) {
+            beforeSend: function(config, data) {
                 assert.strictEqual(config.preset, '');
                 assert.strictEqual(config.type, 'json');
                 assert.strictEqual(data, JSON.stringify(body));
@@ -163,7 +163,7 @@ describe('application/json', function() {
                 'Content-Type': 'text/plain' // overwrite
             },
             data: body,
-            transformRequest: function(config, data) {
+            beforeSend: function(config, data) {
                 assert.strictEqual(config.headers['Content-Type'], 'application/json; charset=utf-8');
                 assert.strictEqual(config.preset, 'json');
                 assert.strictEqual(config.type, 'json');
@@ -182,7 +182,7 @@ describe('application/json', function() {
         req.json(url + '/200', {
             method: 'POST',
             data: body,
-            transformRequest: function(config, data) {
+            beforeSend: function(config, data) {
                 assert.strictEqual(config.headers['Content-Type'], 'application/json; charset=utf-8');
                 assert.strictEqual(config.preset, 'json');
                 assert.strictEqual(config.type, 'json');
@@ -214,7 +214,7 @@ describe('text/plain', function() {
                 'Content-Type': 'text/plain'
             },
             data: body,
-            transformRequest: function(config, data) {
+            beforeSend: function(config, data) {
                 assert.strictEqual(config.preset, '');
                 assert.strictEqual(config.type, 'plain');
                 assert.strictEqual(data, body);
@@ -236,7 +236,7 @@ describe('text/plain', function() {
                 'Content-Type': 'application/json' // overwrite
             },
             data: body,
-            transformRequest: function(config, data) {
+            beforeSend: function(config, data) {
                 assert.strictEqual(config.headers['Content-Type'], 'text/plain; charset=utf-8');
                 assert.strictEqual(config.preset, 'plain');
                 assert.strictEqual(config.type, 'plain');
@@ -255,7 +255,7 @@ describe('text/plain', function() {
         req.plain(url + '/200', {
             method: 'POST',
             data: body,
-            transformRequest: function(config, data) {
+            beforeSend: function(config, data) {
                 assert.strictEqual(config.headers['Content-Type'], 'text/plain; charset=utf-8');
                 assert.strictEqual(config.preset, 'plain');
                 assert.strictEqual(config.type, 'plain');
@@ -285,7 +285,7 @@ describe('text/raw, a special mode without serialization', function() {
             method: 'POST',
             preset: 'raw',
             data: body,
-            transformRequest: function(config, data) {
+            beforeSend: function(config, data) {
                 assert.strictEqual(config.headers['Content-Type'], undefined);
                 assert.strictEqual(config.preset, 'raw');
                 assert.strictEqual(config.type, 'raw');
@@ -304,7 +304,7 @@ describe('text/raw, a special mode without serialization', function() {
         req.raw(url + '/200', {
             method: 'POST',
             data: body,
-            transformRequest: function(config, data) {
+            beforeSend: function(config, data) {
                 assert.strictEqual(config.headers['Content-Type'], undefined);
                 assert.strictEqual(config.preset, 'raw');
                 assert.strictEqual(config.type, 'raw');
@@ -341,7 +341,7 @@ describe('Custom serialize callback', function() {
                 assert.deepStrictEqual(data, body);
                 return body.toString();
             },
-            transformRequest: function(config, data) {
+            beforeSend: function(config, data) {
                 transformed = triggered; //should be true now
                 assert.strictEqual(triggered, true);
                 assert.strictEqual(data, body.toString());
@@ -373,7 +373,7 @@ describe('Custom serialize callback', function() {
                 assert.deepStrictEqual(data, body);
                 return JSON.stringify(testBody);
             },
-            transformRequest: function(config, data) {
+            beforeSend: function(config, data) {
                 transformed = triggered; //should be true now
                 assert.strictEqual(triggered, true);
                 assert.strictEqual(config.preset, 'json');

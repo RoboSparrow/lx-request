@@ -92,7 +92,7 @@ if ((typeof module !== 'undefined' && module.exports)) {
 
     // for details @see ./test/xapi/legacy.js
 
-    var transformRequestLegacy = function(config) {
+    var beforeSendLegacy = function(config) {
         // responseType
         var method = config.method || 'GET';
         var headers = config.headers || null;
@@ -189,7 +189,7 @@ if ((typeof module !== 'undefined' && module.exports)) {
         var url = endpoint(xapi.lrs, api);
 
         if (config.xapi.legacy) {
-            config = transformRequestLegacy(config);
+            config = beforeSendLegacy(config);
             return req.form(url, config);
         }
 

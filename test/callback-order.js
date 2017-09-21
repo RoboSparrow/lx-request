@@ -31,7 +31,7 @@ describe('Callback sequence order', function() {
 
     it('should follow the callback order for a successful (200) GET request', function(done) {
         const called = [];
-        const expected = ['transformRequest', 'transformResponse', 'success', 'always'];
+        const expected = ['beforeSend', 'transformResponse', 'success', 'always'];
         req.request(
             url + '/200',
             {
@@ -40,8 +40,8 @@ describe('Callback sequence order', function() {
                     called.push('serialize');// should not be called here
                     return data;
                 },
-                transformRequest: function(config, options) {
-                    called.push('transformRequest');
+                beforeSend: function(config, options) {
+                    called.push('beforeSend');
                 },
                 transformResponse: function(config, options) {
                     called.push('transformResponse');
@@ -65,7 +65,7 @@ describe('Callback sequence order', function() {
 
     it('should follow the callback for an errornous (400) GET request', function(done) {
         const called = [];
-        const expected = ['transformRequest', 'transformResponse', 'error', 'always'];
+        const expected = ['beforeSend', 'transformResponse', 'error', 'always'];
         req.request(
             url + '/400',
             {
@@ -74,8 +74,8 @@ describe('Callback sequence order', function() {
                     called.push('serialize');// should not be called here
                     return data;
                 },
-                transformRequest: function(config, options) {
-                    called.push('transformRequest');
+                beforeSend: function(config, options) {
+                    called.push('beforeSend');
                 },
                 transformResponse: function(config, options) {
                     called.push('transformResponse');
@@ -99,7 +99,7 @@ describe('Callback sequence order', function() {
 
     it('should follow the callback order for a successful (204) data (PUT) request', function(done) {
         const called = [];
-        const expected = ['serialize', 'transformRequest', 'transformResponse', 'success', 'always'];
+        const expected = ['serialize', 'beforeSend', 'transformResponse', 'success', 'always'];
         req.request(
             url + '/204',
             {
@@ -109,8 +109,8 @@ describe('Callback sequence order', function() {
                     called.push('serialize');
                     return data;
                 },
-                transformRequest: function(config, options) {
-                    called.push('transformRequest');
+                beforeSend: function(config, options) {
+                    called.push('beforeSend');
                 },
                 transformResponse: function(config, options) {
                     called.push('transformResponse');
@@ -134,7 +134,7 @@ describe('Callback sequence order', function() {
 
     it('should follow the callback order for anrrornous (400) data (PUT) request', function(done) {
         const called = [];
-        const expected = ['serialize', 'transformRequest', 'transformResponse', 'error', 'always'];
+        const expected = ['serialize', 'beforeSend', 'transformResponse', 'error', 'always'];
         req.request(
             url + '/400',
             {
@@ -144,8 +144,8 @@ describe('Callback sequence order', function() {
                     called.push('serialize');
                     return data;
                 },
-                transformRequest: function(config, options) {
-                    called.push('transformRequest');
+                beforeSend: function(config, options) {
+                    called.push('beforeSend');
                 },
                 transformResponse: function(config, options) {
                     called.push('transformResponse');

@@ -191,7 +191,7 @@ describe('Headers', function() {
                 'x-lowercase': 'lower',
                 'x-MixED-CaSe': 'mixed'
             },
-            transformRequest: function(config) {
+            beforeSend: function(config) {
                 assert.strictEqual(config.headers['X-UPPERCASE'], undefined);
                 assert.strictEqual(config.headers['x-lowercase'], undefined);
                 assert.strictEqual(config.headers['x-MixED-CaSe'], undefined);
@@ -213,7 +213,7 @@ describe('Headers', function() {
                 'X-CUSTOM': 'one',
                 'x-custom': 'two'
             },
-            transformRequest: function(config) {
+            beforeSend: function(config) {
                 assert.strictEqual(config.headers['X-CUSTOM'], undefined);
                 assert.strictEqual(config.headers['X-Custom'], 'two');
             },

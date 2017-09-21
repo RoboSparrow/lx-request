@@ -28,7 +28,7 @@ New
         - form:     application/x-www-form-urlencoded
         - raw:      full manual mode, no headers and serializer
     - req methods for each preset: `req.json(), req.plain(), req.form(), req.raw()`
-    - `config.transformRequest=function(config, data, requestInstance)` callback for inspecting a processed request who is about to be sent
+    - `config.beforeSend=function(config, data, requestInstance)` callback for inspecting a processed request who is about to be sent
         - config: processed `req.config`, changes have no effect
         - data: (string|null) serialized data, changes have no effect
         - requestInstance: xhr or http request instance. you *may* apply changes here

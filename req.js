@@ -360,8 +360,8 @@ var req = (function() {
             //TODO options.headers['Content-Length'] = bytelength;
         }
 
-        if (typeof config.transformRequest === 'function') {
-            config.transformRequest(config, data, xhr);
+        if (typeof config.beforeSend === 'function') {
+            config.beforeSend(config, data, xhr);
         }
 
         xhr.send(data);
@@ -391,8 +391,8 @@ var req = (function() {
             options.headers['Content-Length'] = Buffer.byteLength(data);
         }
 
-        if (typeof config.transformRequest === 'function') {
-            config.transformRequest(config, data, options);
+        if (typeof config.beforeSend === 'function') {
+            config.beforeSend(config, data, options);
         }
 
         var result = new Response();
@@ -538,7 +538,7 @@ var req = (function() {
             headers: {},                // header object (key, value), maybe overwritten by "preset" option
             preset: '',                 // 'json', 'form', 'plain', 'raw'
             serialize: false,           // custom serializer function. taking data and returning string
-            transformRequest: false,    // inspect a request who is about to be sent. function(mergedConfig, parsedData, xhrInstance|httpRequestOptions) note that config changes will have no effect
+            beforeSend: false,    // inspect a request who is about to be sent. function(mergedConfig, parsedData, xhrInstance|httpRequestOptions) note that config changes will have no effect
             transformResponse: false,   // function(raw)
             success: function() {},     // (Response, raw)
             error: function() {},       // (Response, raw)

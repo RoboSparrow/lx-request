@@ -54,7 +54,7 @@ describe('promise', function() {
 
     it('when req.ASYNC === "promise", it should make promise request, success', function() {
         let always = false;
-        let transformRequest = false;
+        let beforeSend = false;
         let transformResponse = false;
         let success = false;
         let error = false;
@@ -62,8 +62,8 @@ describe('promise', function() {
         req.ASYNC = 'promise';
 
         return req.request(url + '/200', {
-            transformRequest: function() {
-                transformRequest = true;
+            beforeSend: function() {
+                beforeSend = true;
             },
             transformResponse: function() {
                 transformResponse = true;
@@ -80,7 +80,7 @@ describe('promise', function() {
         })
         .then(function(result) {
             assert.strictEqual(result.status, 200);
-            assert.strictEqual(transformRequest, true, 'transformRequest callback was called');
+            assert.strictEqual(beforeSend, true, 'beforeSend callback was called');
             assert.strictEqual(transformResponse, true, 'transformRespone callback was called');
             assert.strictEqual(always, true, 'always callback was called');
             assert.strictEqual(success, false, 'always callback was NOT called');
@@ -91,7 +91,7 @@ describe('promise', function() {
 
     it('when req.ASYNC === "promise", it should make promise request, error', function() {
         let always = false;
-        let transformRequest = false;
+        let beforeSend = false;
         let transformResponse = false;
         let success = false;
         let error = false;
@@ -99,8 +99,8 @@ describe('promise', function() {
         req.ASYNC = 'promise';
 
         return req.request(url + '/500', {
-            transformRequest: function() {
-                transformRequest = true;
+            beforeSend: function() {
+                beforeSend = true;
             },
             transformResponse: function() {
                 transformResponse = true;
@@ -117,7 +117,7 @@ describe('promise', function() {
         })
         .catch(function(result) {
             assert.strictEqual(result.status, 500);
-            assert.strictEqual(transformRequest, true, 'transformRequest callback was called');
+            assert.strictEqual(beforeSend, true, 'beforeSend callback was called');
             assert.strictEqual(transformResponse, true, 'transformRespone callback was called');
             assert.strictEqual(always, true, 'always callback was called');
             assert.strictEqual(success, false, 'always callback was NOT called');

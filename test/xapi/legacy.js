@@ -71,7 +71,7 @@ describe('req.xapi cross domain mode', function() {
             '/statements',
             {
                 method: 'GET',
-                transformRequest: function(config) {
+                beforeSend: function(config) {
                     assert.strictEqual(config.headers['Content-Type'], 'application/x-www-form-urlencoded; charset=utf-8', 'request method was transformed to POST');
                     assert.strictEqual(config.method, 'POST', 'request method was transformed to POST');
                     assert.strictEqual(config.query.method, 'GET', 'initial request method attached as query param `method`');

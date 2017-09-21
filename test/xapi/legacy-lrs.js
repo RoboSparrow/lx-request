@@ -101,7 +101,7 @@ describe('req.xapi cross domain mode', function() {
                 query: {
                     statementId: id
                 },
-                transformRequest: function(config) {
+                beforeSend: function(config) {
                     assert.strictEqual(config.headers['Content-Type'], 'application/x-www-form-urlencoded; charset=utf-8', 'request method was transformed to POST');
                     assert.strictEqual(config.method, 'POST', 'request method was transformed to POST');
                     assert.strictEqual(config.query.method, 'PUT', 'initial request method attached as query param `method`');
@@ -130,7 +130,7 @@ describe('req.xapi cross domain mode', function() {
             {
                 method: 'POST',
                 data: statement,
-                transformRequest: function(config) {
+                beforeSend: function(config) {
                     assert.strictEqual(config.headers['Content-Type'], 'application/x-www-form-urlencoded; charset=utf-8', 'request method was transformed to POST');
                     assert.strictEqual(config.method, 'POST', 'request method was transformed to POST');
                     assert.strictEqual(config.query.method, 'POST', 'initial request method attached as query param `method`');
@@ -159,7 +159,7 @@ describe('req.xapi cross domain mode', function() {
                     registration: registration,
                     ascending: true
                 },
-                transformRequest: function(config) {
+                beforeSend: function(config) {
                     assert.strictEqual(config.headers['Content-Type'], 'application/x-www-form-urlencoded; charset=utf-8', 'request method was transformed to POST');
                     assert.strictEqual(config.method, 'POST', 'request method was transformed to POST');
                     assert.strictEqual(config.query.method, 'GET', 'initial request method attached as query param `method`');
@@ -191,7 +191,7 @@ describe('req.xapi cross domain mode', function() {
                 limit: 1, // 2 smts being sent before
                 registration: registration
             },
-            transformRequest: function(config) {
+            beforeSend: function(config) {
                 assert.strictEqual(config.headers['Content-Type'], 'application/x-www-form-urlencoded; charset=utf-8', 'request method was transformed to POST');
                 assert.strictEqual(config.method, 'POST', 'request method was transformed to POST');
                 assert.strictEqual(config.query.method, 'GET', 'initial request method attached as query param `method`');
@@ -249,7 +249,7 @@ describe('req.xapi promise, legacy', function() {
                 limit: 1
             },
             promise: true,
-            transformRequest: function(config) {
+            beforeSend: function(config) {
                 assert.strictEqual(config.headers['Content-Type'], 'application/x-www-form-urlencoded; charset=utf-8', 'request method was transformed to POST');
                 assert.strictEqual(config.method, 'POST', 'request method was transformed to POST');
                 assert.strictEqual(config.query.method, 'GET', 'initial request method attached as query param `method`');
