@@ -10,8 +10,8 @@ x req.form, req plain, what to do with req.raw?
 x ~~accept headers~~ leave to client
 x req.mergeHash rewrite
 x ~~req.request(), req.xapi() retain initial config instance ?~~ nope, leave as basic mutation killer
-- rename beforeSend: beforeSend?
-- changelog
+x rename transformRequest: beforeSend?
+x changelog
 - test
 
 moved to next stage
