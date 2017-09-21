@@ -17,7 +17,7 @@ They are now automatically stringified if the request is a json request, otherwi
 New
 
 * req
-    - ES6 Promise mode for all requests, i.e. `req.post(config,data).then()...`, `req.xapi.get(api, config).then()...`
+    - ES6 Promise mode for all requests, i.e. `req.post(config,data).then()...`, `req.xapi.get(api, config).then()...` config.success and config.error cllbacks are ignored
     - `req.ASYNC='promise'|'callback` global configure asynchronous mode. Default is "callback"
     - `config.promise=true|false` set async mode for a single request (default: false)
     - `config.serialiser=function(data){return <string>;}` optionally inject custom serializer for config.data
@@ -28,7 +28,10 @@ New
         - form:     application/x-www-form-urlencoded
         - raw:      full manual mode, no headers and serializer
     - req methods for each preset: `req.json(), req.plain(), req.form(), req.raw()`
-    - config.transformRequest
+    - `config.transformRequest=function(config, data, requestInstance)` callback for inspecting a processed request who is about to be sent
+        - config: processed `req.config`, changes have no effect
+        - data: (string|null) serialized data, changes have no effect
+        - requestInstance: xhr or http request instance. you *may* apply changes here
 
 * req.xapi
     - `req.xapi.statements(config, options)` aggregator refactor,
