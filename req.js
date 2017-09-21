@@ -211,16 +211,6 @@ var req = (function() {
         return str.join('&');
     };
 
-    // parse Body
-    // - TODO this is problematic:
-    // - https://www.w3.org/Protocols/rfc1341/4_Content-Type.html
-    // -- seven standard types: text, multipart, message,  image , audio, video, application: if none set then Content-type: text/plain; charset=us-ascii is assumed
-    // -- available media types: http://www.iana.org/assignments/media-types/media-types.xhtml
-    // --  "If another primary type is to be used for any reason, it must be given a name starting with "X-" to indicate its non-standard status and to avoid any potential conflict with a future official name."
-    // - we should inspect the content-type-header, text/plain, multipart etc and the parse
-    // - alternatively provide highlevel helper methods like req.multipart(), req.formdata()
-    // - who parse body data and set headers appropriately before this request. in this case json maybe stay here as the most common complex type
-
     var Serializer = {
 
         json: function(data) {
@@ -450,9 +440,11 @@ var req = (function() {
         return null;
     };
 
-    // TODO move
+    /////
+    // config controller
     // TODO charset global option
     // - https://xhr.spec.whatwg.org/
+    ////
 
     var applyConfig = function(config) {
 
@@ -592,7 +584,7 @@ var req = (function() {
 
     exports.extend = extend;
     exports.extendDefaults = extendDefaults;
-    exports.serializeParams = encodeData;//TODO serializer
+    exports.serializeParams = encodeData;
 
     exports.request = request;
 

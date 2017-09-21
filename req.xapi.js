@@ -11,6 +11,10 @@ if ((typeof module !== 'undefined' && module.exports)) {
 
     'use strict';
 
+    ////
+    // aggregation
+    ////
+
     // aggregate helper (callback mode only, see search())
     var aggregate = function(api, config, options) {
 
@@ -82,9 +86,12 @@ if ((typeof module !== 'undefined' && module.exports)) {
         return aggregate(api, config, options);
     };
 
-    /**
-     * for details @see ./test/xapi/legacy.js
-     */
+    ////
+    // xapi legacy mode (CORS)
+    ////
+
+    // for details @see ./test/xapi/legacy.js
+
     var transformRequestLegacy = function(config) {
         // responseType
         var method = config.method || 'GET';
@@ -132,6 +139,10 @@ if ((typeof module !== 'undefined' && module.exports)) {
 
         return config;
     };
+
+    ////
+    // config
+    ////
 
     var lrs = function(config) {
         var xapi = config.xapi || {};
