@@ -6,10 +6,13 @@ x xapi legacy & req.application/x-www-form-urlencoded
 x xapi statements: cap
 x xapi switch lrs config for single calls
 x global promise option
-- req.form, req plain, what to do with req.raw?
+x req.form, req plain, what to do with req.raw?
 x ~~accept headers~~ leave to client
 x req.mergeHash rewrite
 x ~~req.request(), req.xapi() retain initial config instance ?~~ nope, leave as basic mutation killer
+- rename transformRequest: beforeSend?
+- changelog
+- test
 
 moved to next stage
 
@@ -21,6 +24,8 @@ moved to next stage
 - xhr onerror > error
 - error catching json parse
 - if (xhr.status < 299 && !result.error)
+
+further
 
 - documentation
 - ES6 modules
