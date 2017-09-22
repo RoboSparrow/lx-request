@@ -38,7 +38,7 @@ req('<url>', options);
 req.xapi.LRS = '<url>';
 req.xapi.AUTH = 'Basic <base64 user:name>';
 req.xapi.VERSION = '<version>';
-            
+
 req.xapi('/statements', options);
 
 ```

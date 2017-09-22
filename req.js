@@ -538,7 +538,7 @@ var req = (function() {
             headers: {},                // header object (key, value), maybe overwritten by "preset" option
             preset: '',                 // 'json', 'form', 'plain', 'raw'
             serialize: false,           // custom serializer function. taking data and returning string
-            beforeSend: false,    // inspect a request who is about to be sent. function(mergedConfig, parsedData, xhrInstance|httpRequestOptions) note that config changes will have no effect
+            beforeSend: false,          // inspect a request who is about to be sent. function(mergedConfig, parsedData, xhrInstance|httpRequestOptions) note that config changes will have no effect
             transformResponse: false,   // function(raw)
             success: function() {},     // (Response, raw)
             error: function() {},       // (Response, raw)
