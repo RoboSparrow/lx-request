@@ -225,3 +225,37 @@ describe('Headers', function() {
     });
 
 });
+
+describe('Query string', function() {
+
+    const url = 'http://localhost:8000';
+
+    before(beforeSpec);
+    after(afterSpec);
+
+    it('should append the query object to the url', function(done) {
+        req.get(url + '/200', {
+            query: {
+                query: 1
+            },
+            always: function(result, response) {
+                assert.strictEqual(result.status, 200);
+                assert.strictEqual(result.headers['x-req-search'], '?query=1');
+                done();
+            }
+        });
+    });
+
+    it('should append the query object to an url parameter with an existing (hardcoded) query', function(done) {
+        req.get(url + '/200?query=1', {
+            query: {
+                query: 2
+            },
+            always: function(result, response) {
+                assert.strictEqual(result.status, 200);
+                assert.strictEqual(result.headers['x-req-search'], '?query=1&query=2');
+                done();
+            }
+        });
+    });
+});

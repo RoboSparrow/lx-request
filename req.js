@@ -555,7 +555,8 @@ var req = (function() {
         // encode query params
         var query = _encodeQuery(config);
         if (query) {
-            url = url + '?' + query;
+            var glue = (url.indexOf('?') > -1) ? '&' : '?';
+            url = url + glue + query;
         }
 
         var fn = (NODE) ? _httpRequest : _xhrRequest;
