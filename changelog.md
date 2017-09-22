@@ -37,8 +37,8 @@ New
     - `req.xapi.statements(config, options)` aggregator refactor,
         - added promise support (req.AYSYNC|config.promise)
         - `options.cap=<number>` optional max statements cap: resolves aggregation if gstatements.length >= cap.
-        - `options.nextFn = function(resonse, config){return <uri>l|null;}` optional cb for compiling next request uri
-        - `options.dataFn = function(resonse, config){return <array>;}`  optional cb for extracting records from single response
+        - `options.nextFn = function(resonse){return <uri>l|null;}` optional cb for compiling next request uri
+        - `options.dataFn = function(resonse){return <array>;}`  optional cb for extracting records from single response
     - new `config.xapi`, overwrite global lrs configruation for single requests
         - `config.xapi.lrs=<uri>`
         - `config.xapi.auth=<base64(user:password)>`
@@ -55,9 +55,10 @@ New
     - `req.xapi.statements()` aggregator: arguments have changed, takes now 1) req.config and 2) a separate aggregator config object
     - serializers throw custom exceptions (parsers don't)
 
-* Other changes/refactor:
+* Other:
     - refactor serializer
     - refactor request header
     - refactor search aggregator
     - new tests
     - `extend()`, rewrite deep merge objects
+    - misc fixes

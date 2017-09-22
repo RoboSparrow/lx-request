@@ -42,7 +42,7 @@ if ((typeof module !== 'undefined' && module.exports)) {
         };
 
         var success = function(res, ins) {
-            next = options.nextFn(res, config);
+            next = options.nextFn(res);
             var length = mergeData(res);
 
             if (!next || next === prev) {
@@ -60,6 +60,7 @@ if ((typeof module !== 'undefined' && module.exports)) {
             }
             prev = next;
 
+            config.query = {};// clear query object for follow-up calls as they should be part of the "more" url
             req.xapi.get(next, config);
         };
 
@@ -238,12 +239,11 @@ if ((typeof module !== 'undefined' && module.exports)) {
                 return res.data.statements;
             },
             // callback for building parse more url
-            nextFn: function(res, conf) {
+            nextFn: function(res) {
                 var more = res.data.more || null;
                 if (!more) {
                     return null;
                 }
-                conf.query = null;
 
                 var parts = more.split('/statements');
                 return '/statements' + parts[parts.length - 1];
