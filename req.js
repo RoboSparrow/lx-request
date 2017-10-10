@@ -446,7 +446,7 @@ var req = (function() {
     // - https://xhr.spec.whatwg.org/
     ////
 
-    var applyConfig = function(config) {
+    var applyConfig = function(config, isHttp) {
 
         var preset = config.preset;
         var type = (preset) ? preset : 'none';
@@ -457,7 +457,9 @@ var req = (function() {
             case 'json': {
                 config.headers['Content-Type'] = 'application/json; charset=utf-8';
                 config.headers['Accept'] = 'application/json, text/plain, */*';
-                config.headers['Accept-Charset'] = 'utf-8';
+                if(isHttp) {
+                    config.headers['Accept-Charset'] = 'utf-8';
+                }
                 serializer = Serializer.json;
                 break;
             }
@@ -465,7 +467,9 @@ var req = (function() {
             case 'form': {
                 config.headers['Content-Type'] = 'application/x-www-form-urlencoded; charset=utf-8';
                 config.headers['Accept'] = 'application/x-www-form-urlencoded, text/plain, */*';
-                config.headers['Accept-Charset'] = 'utf-8';
+                if(isHttp) {
+                    config.headers['Accept-Charset'] = 'utf-8';
+                }
                 serializer = Serializer.form;
                 break;
             }
@@ -473,7 +477,9 @@ var req = (function() {
             case 'plain': {
                 config.headers['Content-Type'] = 'text/plain; charset=utf-8';
                 config.headers['Accept'] = 'text/plain, */*';
-                config.headers['Accept-Charset'] = 'utf-8';
+                if(isHttp) {
+                    config.headers['Accept-Charset'] = 'utf-8';
+                }
                 serializer = Serializer.plain;
                 break;
             }
@@ -550,7 +556,7 @@ var req = (function() {
         // normalize headers
         normalizeHeaders(config);
         // apply request type, presets, set serializer
-        applyConfig(config);
+        applyConfig(config, NODE);
 
         // encode query params
         var query = _encodeQuery(config);
