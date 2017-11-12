@@ -36,7 +36,7 @@ var req = (function() {
     // Utils
     ////
 
-    var _isScalar = function(v) {
+    var isScalar = function(v) {
         var type = typeof v;
         return v === null || ['string', 'number', 'boolean'].indexOf(type) > -1;
     };
@@ -86,7 +86,7 @@ var req = (function() {
                     src[key] = val;
                     continue;
                 }
-                if (_isScalar(val)) {
+                if (isScalar(val)) {
                     src[key] = val;
                     continue;
                 }
@@ -204,7 +204,7 @@ var req = (function() {
 
         for (var key in obj) {
             if (obj.hasOwnProperty(key)) {
-                val = (_isScalar(obj[key])) ? obj[key] : JSON.stringify(obj[key]);
+                val = (isScalar(obj[key])) ? obj[key] : JSON.stringify(obj[key]);
                 str.push(encodeURIComponent(key) + '=' + encodeURIComponent(val));
             }
         }
@@ -224,7 +224,7 @@ var req = (function() {
 
         form: function(data) {
             // scalars
-            if (_isScalar(data)) {
+            if (isScalar(data)) {
                 return encodeURI(data);
             }
             // TODO optimise
@@ -592,6 +592,7 @@ var req = (function() {
     exports.extend = extend;
     exports.extendDefaults = extendDefaults;
     exports.serializeParams = encodeData;
+    exports.isScalar = isScalar;
 
     exports.request = request;
 
