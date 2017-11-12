@@ -175,6 +175,22 @@ describe('Basic test', function() {
         });
     });
 
+    it('Network errors should trigger error and always callbacks', function(done) {
+        let triggered = [];
+        // force http to throw an error event
+        req.get('invalid://dgfg', {
+            error: function(result, response) {
+                triggered.push('error');
+                assert.strictEqual(result.error instanceof Error, true); //node http, in xhr error may be undefinded
+            },
+            always: function(result, response) {
+                triggered.push('always');
+                assert.strictEqual(triggered.toString(), 'error,always');
+                done();
+            }
+        });
+    });
+
 });
 
 describe('Headers', function() {

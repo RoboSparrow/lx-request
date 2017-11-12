@@ -352,6 +352,11 @@ var req = (function() {
         // catches cors requests
         xhr.onerror = function(error) {
             result.error = error;
+            var message = (error && error.message) ? error.message : e;
+            result.statusText = 'Network error or CORS conflict: ' + message;
+
+            config.error(result, request);
+            config.always(result, error, config);
         };
 
         var data = null;
@@ -431,6 +436,9 @@ var req = (function() {
 
         request.on('error', function(error) {
             result.error = error;
+            var message = (error && error.message) ? error.message : e;
+            result.statusText = 'Network error' + message;
+
             config.error(result, request);
             config.always(result, error, config);
         });
