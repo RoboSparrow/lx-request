@@ -313,7 +313,7 @@ var req = (function() {
     var _xhrRequest = function(url, config) {
 
         var xhr = new XMLHttpRequest();
-        xhr.open(config.method, url, true);
+        xhr.open(config.method, url, true);// TODO catch exception (legacy IE CORS throws exception and does not trigger onerror)
 
         // headers
         for (var key in config.headers) {
