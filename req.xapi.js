@@ -92,7 +92,6 @@ if ((typeof module !== 'undefined' && module.exports)) {
     ////
 
     // for details @see ./test/xapi/legacy.js
-
     var beforeSendLegacy = function(config) {
         // responseType
         var method = config.method || 'GET';
@@ -103,7 +102,14 @@ if ((typeof module !== 'undefined' && module.exports)) {
         var legacyData = {};
 
         if (query) {
-            req.extend(legacyData, query);
+            var flatQ = {};
+            for (var key in query) {
+                if (!query.hasOwnProperty(key)) {
+                    continue;
+                }
+                flatQ[key] = (req.isScalar(query[key])) ? query[key] : JSON.stringify(query[key]);
+            }
+            req.extend(legacyData, flatQ);
         }
 
         // req.xapi() works with preset 'json' which inserts json header later on. We need to insrt it manully since we will change the preset to form

@@ -64,6 +64,8 @@ describe('req.xapi cross domain mode', function() {
     const statementIds = []; //array of statement.ids
     const now = new Date();
 
+    const statements = [];
+
     const createStatement = (activitySuffix, id) => {
         id = id || null;
         const smt = {
@@ -84,6 +86,9 @@ describe('req.xapi cross domain mode', function() {
         if (id) {
             smt.id = id;
         }
+
+        statements.push(smt);
+
         return smt;
     };
 
@@ -179,6 +184,33 @@ describe('req.xapi cross domain mode', function() {
         );
 
     });
+
+    it('GET /statements: json query params', function(done) {
+        const ref = statements[0];
+
+        req.xapi(
+            '/statements',
+            {
+                method: 'GET',
+                query: {
+                    registration: registration,
+                    agent: ref.actor,
+                    activity: ref.object
+                },
+                beforeSend: function(config) {
+                    assert.strictEqual(config.data.registration, registration, 'attaches query param "registration" to data body');
+                    assert.strictEqual(config.data.agent, JSON.stringify(ref.actor), 'stringifies object param "actor"');
+                    assert.strictEqual(config.data.activity, JSON.stringify(ref.object), 'stringifies object param "actitivty"');
+                },
+                always: function(res, ins) {
+                    assert.strictEqual(res.status, 200, 'response status: 200');
+                    setTimeout(done, 500);
+                }
+            }
+        );
+
+    });
+
     // @see https://github.com/adlnet/xAPI-Spec/issues/1065
     xit('req.xapi.statements() aggregation: legacy', function(done) {
 
