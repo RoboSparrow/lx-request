@@ -62,3 +62,9 @@ New
     - new tests
     - `extend()`, rewrite deep merge objects
     - misc fixes
+
+#### 0.3.1
+
+    - fixes for xhr headers
+    - fix req.xapi legacy params
+    - improved handling of errors thrown by http clients
