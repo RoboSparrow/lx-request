@@ -6,7 +6,12 @@
 * xapi switch lrs config for single calls
 * rewrite defaults merging
 
-0.3.1 security
+0.3.2 docs
+
+ * documentation
+ * license
+
+0.3.3 security
 
 * optimise low-level function (merge, parse etc)
 * merge replace config merge with clone (destroy instances)
@@ -15,12 +20,12 @@
 * maybe: req support for FormData and FileApi
 * req.DEBUG change mergin ing order of defaukts (overwrite) attach extra Data to response
 
-0.3.2
+0.3.4
 
 * jsdoc
 * api docs
 
-0.3.3
+0.3.5
 
 * webworker support
 
