@@ -68,3 +68,8 @@ New
     - fixes for xhr headers
     - fix req.xapi legacy params
     - improved handling of errors thrown by http clients
+
+#### 0.3.2
+
+    - documentation
+    - MIT license

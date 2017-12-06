@@ -33,10 +33,8 @@ A lightwight standalone http request library. Transparent and dependency free re
 Node
 
 ```javascript
-
 // default requests
 var req = require('./req.js');
-
 // xAPI requests
 var req = require('./req.xapi.js');
 
@@ -160,7 +158,7 @@ Global configuration allows you to change the behaviour for all requests
 `req.ASYNC`: set callback or promise mode for all request: either '`callback`' (default) or `'promise'`
 
 ```javascript
-req.ASYNC= 'promise';
+req.ASYNC = 'promise';
 
 req.get(<uri>).then(() => {
     alert("Look Ma, it's a promise!");
@@ -239,14 +237,73 @@ var defaults = {
 
 ## Global configuration<a name="xapi-config"></a>
 
-```javascript
-req.xapi.LEGACY = false;
+Configure LRS
 
-req.xapi.LRS = '';
-req.xapi.AUTH = '';
-req.xapi.VERSION = '';
+```javascript
+req.xapi.LRS = <string:uri>;
+req.xapi.AUTH = <string>; // base64 encoded HTTP Auth string (<user>:<password>), see req.xapi.AUTH
+req.xapi.VERSION = <string:semver>; // xAPI sspec version
 ```
 
+a working example config:
+
+```javascript
+    req.xapi.LRS = 'https://lrs.adlnet.gov/xAPI';
+    req.xapi.AUTH = 'Basic ' + req.xapi.toBase64('tom:1234');
+    req.xapi.VERSION = '1.0.2';
+    req.ASYNC = true;
+
+    req.get('/statements').then((res) => {
+        console.log(res.data.statements);
+    });
+```
+
+Optional set [Legacy CORS mode](https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Communication.md#alt-request-syntax)
+
+```
+req.xapi.LEGACY = true;
+```
 ## Statement aggregation<a name="xapi-aggregation"></a>
 
-TODO, limit
+The aggregator is a simple batch function automating[paginated statement retrieval](https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Data.md#details-21).
+It accumulates statements for a specified query via mutiple calls until the pagination resolves.
+The result is a [response](#req-response) instance like you would get for a single statments GET query, only that `res.data.statements` holds an array of all aggregated statements
+
+
+```javascript
+req.xapi.statements({
+    promise: true
+}).then((res) => {
+    console.log(res.data.statements);
+});
+```
+
+* Tip: the `options.always()` callback is called on each step and can be used to indicate the aggregation process to the user
+
+```javascript
+let length = 0;
+req.xapi.statements({
+    promise: true,
+    always: function(res) => {
+        length += res.data.statements.length;
+        console.log('fetched' + length + 'statements');
+    }
+}).then((res) => {
+    console.log('Finished: ' + res.data.statements.length + 'statements');
+});
+```
+
+`cap` option:
+
+The `cap` option can be set in order to stop and resolve the aggregation if a certain threshold of received statements is surpassed.
+
+Note that `cap`  only defines where to cut an aggreation. It does not define how many statements are returned.
+
+```javascript
+req.xapi.statements({
+    promise: true,
+    cap: 1000
+}).then((res) => {
+    console.log('Capped request finished: ' + res.data.statements.length + 'statements');
+});
+```

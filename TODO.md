@@ -9,5 +9,4 @@
 
 further
 
-- documentation
 - ES6 modules
