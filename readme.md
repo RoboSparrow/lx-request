@@ -1,6 +1,6 @@
 # lxRequest
 
-A leightwight and standalone http request library. Transparent and dependency free requests via `xhr` (browser) or `http` (node).
+A leightweight and standalone http request library. Transparent and dependency free requests via `xhr` (browser) or `http` (node).
 
 - node or browser
 - no dependencies
@@ -10,6 +10,8 @@ A leightwight and standalone http request library. Transparent and dependency fr
 - transparent, great for testing
 - presets
 - [xAPI](https://github.com/adlnet/xAPI-Spec/blob/master/xAPI.md ) requests and xAPI statement aggregation
+
+License: MIT
 
 # Contents
 
