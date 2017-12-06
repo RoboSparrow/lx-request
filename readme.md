@@ -26,7 +26,7 @@ A lightwight standalone http request library. Transparent and dependency free re
     - [Global configuration](#xapi-config)
     - [Statement aggreation](#xapi-aggregation)
 
-#Request<a name="req"></a>
+# HTTP Requests<a name="req"></a>
 
 ## Usage
 
@@ -136,7 +136,7 @@ req.plain('<string:url>', <object:options>); // text/plain
 req.raw('<string:url>', <object:options>); // no content type, alias of req.request()
 ```
 
-## Request Options<a name="req-options"></a>
+## Request options<a name="req-options"></a>
 
 ```javascript
 var defaults = {
@@ -153,7 +153,7 @@ var defaults = {
     always: function() {}       // this callback is always invoked (response, http|xhr, config)
 };
 ```
-## Global Config<a name="req-config"></a>
+## Global configuration<a name="req-config"></a>
 
 Global configuration allows you to change the behaviour for all requests
 
@@ -201,15 +201,52 @@ req.xapi('/statements', {
     ...req.options
 });
 ```
-## Request options<a name="xapi-options"></a>
-TODO
 
-## Global Config<a name="xapi-config"></a>
-TODO
+Shortcut methods
+
+```
+req.xapi.get(api, config);
+req.xapi.head(api, config);
+req.xapi.delete(api, config);
+req.xapi.post(api, data, config);
+req.xapi.put(api, data, config);
+```
+
+Bulk fetch paginated statements
+
+```
+req.xapi.statements(config, options);
+```
+
+Helper methods
+
+```
+req.xapi.uuid();  // creates a RFC 4122  UUID
+req.xapi.toBase64(<string>) // Base 64 encode string
+```
+
+## xAPI Request options<a name="xapi-options"></a>
+
+```javascript
+var defaults = {
+    /* these options allow to overwrite the global req.XAPI config per request*/
+    lrs: '',            // set LRS endpoint per request, see req.xapi.LRS
+    auth: '',           // set LRS Basic auth per request, base64 encoded HTTP Auth string (<user>:<password>), see req.xapi.AUTH
+    version: '',        // set xAPI version per request, , see req.xapi.VERSION
+    legacy : false      // trigger alternate request syntax (IE CORS mode), see req.xapi.LEGACY, https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Communication.md#alt-request-syntax
+};
+```
+
+## Global configuration<a name="xapi-config"></a>
+
+```javascript
+req.xapi.LEGACY = false;
+
+req.xapi.LRS = '';
+req.xapi.AUTH = '';
+req.xapi.VERSION = '';
+```
 
 ## Statement aggregation<a name="xapi-aggregation"></a>
 
-
-@TODO
-
-`xapi.LEGACY` triggers  xAPI 'CORS' mode
+TODO, limit
