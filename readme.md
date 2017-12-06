@@ -1,8 +1,6 @@
-> Note. This repo is currently not licensed, as it is ALPHA and in active development. However there is nothing secret with the code. Feedback welcome.
-
 # lxRequest
 
-A lightwight standalone http request library. Transparent and dependency free requests via `xhr` (browser) or `http` (node).
+A leightwight and standalone http request library. Transparent and dependency free requests via `xhr` (browser) or `http` (node).
 
 - node or browser
 - no dependencies
@@ -184,7 +182,7 @@ All requests return (or resolve) to a simple instance of the Response object
 
 # xAPI requests<a name="req-xapi"></a>
 
-`req.xapi` extends `req` for making [xAPI compliant http requests](https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Communication.md#partthree)
+`req.xapi` extends `req` for making [xAPI compliant HTTP requests](https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Communication.md#partthree)
 
 ```javascript
 // step 1: globally configure LRS auth
@@ -265,9 +263,9 @@ req.xapi.LEGACY = true;
 ```
 ## Statement aggregation<a name="xapi-aggregation"></a>
 
-The aggregator is a simple batch function automating[paginated statement retrieval](https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Data.md#details-21).
-It accumulates statements for a specified query via mutiple calls until the pagination resolves.
-The result is a [response](#req-response) instance like you would get for a single statments GET query, only that `res.data.statements` holds an array of all aggregated statements
+The aggregator is a simple batch function automating [paginated statement retrieval](https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Data.md#details-21).
+It accumulates statements for a specified query via multiple calls until the pagination resolves.
+The result is a [response](#req-response) instance like you would get for a single statements GET query, only that `res.data.statements` holds now an array of all aggregated statements
 
 
 ```javascript
@@ -297,7 +295,7 @@ req.xapi.statements({
 
 The `cap` option can be set in order to stop and resolve the aggregation if a certain threshold of received statements is surpassed.
 
-Note that `cap`  only defines where to cut an aggreation. It does not define how many statements are returned.
+Note that the `cap` option only defines where to cut an aggregation. It does not define how many statements are returned.
 
 ```javascript
 req.xapi.statements({
