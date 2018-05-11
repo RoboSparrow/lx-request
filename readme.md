@@ -4,7 +4,7 @@ A leightwight and standalone http request library. Transparent and dependency fr
 
 - node or browser
 - no dependencies
-- use eas promises or callbacks
+- use either promise or callback mode
 - small and extendable
 - configurable, globally or per request
 - transparent, great for testing
