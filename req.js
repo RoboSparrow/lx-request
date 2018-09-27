@@ -352,7 +352,7 @@ var req = (function() {
         // catches cors requests
         xhr.onerror = function(error) {
             result.error = error;
-            var message = (error && error.message) ? error.message : e;
+            var message = (error && error.message) ? error.message : error;
             result.statusText = 'Network error or CORS conflict: ' + message;
 
             config.error(result, request);
@@ -436,7 +436,7 @@ var req = (function() {
 
         request.on('error', function(error) {
             result.error = error;
-            var message = (error && error.message) ? error.message : e;
+            var message = (error && error.message) ? error.message : error;
             result.statusText = 'Network error' + message;
 
             config.error(result, request);
@@ -465,7 +465,7 @@ var req = (function() {
             case 'json': {
                 config.headers['Content-Type'] = 'application/json; charset=utf-8';
                 config.headers['Accept'] = 'application/json, text/plain, */*';
-                if(isHttp) {
+                if (isHttp) {
                     config.headers['Accept-Charset'] = 'utf-8';
                 }
                 serializer = Serializer.json;
@@ -475,7 +475,7 @@ var req = (function() {
             case 'form': {
                 config.headers['Content-Type'] = 'application/x-www-form-urlencoded; charset=utf-8';
                 config.headers['Accept'] = 'application/x-www-form-urlencoded, text/plain, */*';
-                if(isHttp) {
+                if (isHttp) {
                     config.headers['Accept-Charset'] = 'utf-8';
                 }
                 serializer = Serializer.form;
@@ -485,7 +485,7 @@ var req = (function() {
             case 'plain': {
                 config.headers['Content-Type'] = 'text/plain; charset=utf-8';
                 config.headers['Accept'] = 'text/plain, */*';
-                if(isHttp) {
+                if (isHttp) {
                     config.headers['Accept-Charset'] = 'utf-8';
                 }
                 serializer = Serializer.plain;
