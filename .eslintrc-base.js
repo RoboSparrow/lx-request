@@ -119,7 +119,10 @@ module.exports = {
         "space-unary-ops": ["error", { "words": true, "nonwords": false }],
         "unicode-bom": ["error", "never"],
         // custom style
-        "indent": ["error", 4, { "SwitchCase": 1 }],
+        "indent": ["error", 4, {
+            "SwitchCase": 1,
+            "MemberExpression": 0 // will indent the multi-line property chains with 4 spaces.
+        }],
         "no-multiple-empty-lines": ["error", { "max": 2, "maxBOF": 1 , "maxEOF": 1 }],
         // custom best practises
         "max-depth": ["error", 4],
