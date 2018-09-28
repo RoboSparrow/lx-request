@@ -45,4 +45,4 @@ module.exports = function(grunt) {
         ]
     );
 
-}; // end module.exports
+};

@@ -1,15 +1,15 @@
-0.3.0 promise
+`done` 0.3.0 promise
 
-* simple promise support
-* xapi legacy & req.application/x-www-form-urlencoded
-* xapi statements: cap
-* xapi switch lrs config for single calls
-* rewrite defaults merging
+x simple promise support
+x xapi legacy & req.application/x-www-form-urlencoded
+x xapi statements: cap
+x xapi switch lrs config for single calls
+x rewrite defaults merging
 
-0.3.2 docs
+`done` 0.3.2 docs
 
- * documentation
- * license
+x documentation
+x license
 
 0.3.3 security
 
