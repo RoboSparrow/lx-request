@@ -112,7 +112,7 @@ if ((typeof module !== 'undefined' && module.exports)) {
             req.extend(legacyData, flatQ);
         }
 
-        // req.xapi() works with preset 'json' which inserts json header later on. We need to insrt it manully since we will change the preset to form
+        // req.xapi() works with preset 'json' which inserts json header later on. We need to insert it manually since we will change the preset to form
         headers['Content-Type'] = 'application/json; charset=utf-8';
         if (headers) {
             req.extend(legacyData, headers);
@@ -200,7 +200,7 @@ if ((typeof module !== 'undefined' && module.exports)) {
             return req.form(url, config);
         }
 
-        return req.request(url, config);// note the order of merge. default overwrites are allowed
+        return req.request(url, config); // note the order of merge. default overwrites are allowed
     };
 
     ////
@@ -208,7 +208,7 @@ if ((typeof module !== 'undefined' && module.exports)) {
     ////
 
     req.xapi.get = function(api, config) {
-        return req.xapi(api, config);// note the order of merge. default overwrites are allowed
+        return req.xapi(api, config); // note the order of merge. default overwrites are allowed
     };
 
     req.xapi.head = function(api, config) {
