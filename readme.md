@@ -1,6 +1,6 @@
 # lxRequest
 
-A leightwight http request library. Transparent and *dependency free* requests via XMLHttpRequest (XHR) or node HTTP module.
+A lightwight (ES3 compatible) http request library. Transparent and *dependency free* requests via XMLHttpRequest (XHR) or node HTTP module.
 
 - node or browser requests
 - zero dependencies
