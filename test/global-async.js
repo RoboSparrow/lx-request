@@ -5,11 +5,13 @@ const assert = require('assert');
 const req = require('../req');
 
 const beforeSpec = function(done) {
+    req.ASYNC = 'callback';
     server.listen(8000);
     done();
 };
 
 const afterSpec = function(done) {
+    req.ASYNC = 'callback';
     server.close();
     done();
 };

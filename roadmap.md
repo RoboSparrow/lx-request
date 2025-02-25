@@ -11,27 +11,27 @@ x rewrite defaults merging
 x documentation
 x license
 
-0.3.3 security
+0.3.3 testability
+ 
+x enable global request logging
+
+0.4.0 security
 
 * optimise low-level function (merge, parse etc)
 * merge replace config merge with clone (destroy instances)
 * prepare es-6 src, build, minification
 * response object - debug options (url, headers)
 * maybe: req support for FormData and FileApi
-* req.DEBUG change mergin ing order of defaukts (overwrite) attach extra Data to response
+* req.DEBUG change merging order of defaults (overwrite) attach extra Data to response
 
-0.3.4
+0.4.1
 
 * jsdoc
 * api docs
 
-0.3.5
+0.4.2
 
 * webworker support
-
-0.4.0
-
-* xapi statements: aggregator instance with extended response object
 
 0.5.0
 

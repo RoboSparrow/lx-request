@@ -8,7 +8,8 @@ var req = (function() {
     'use strict';
 
     var settings = {
-        ASYNC: 'callback'
+        ASYNC: 'callback',
+        LOGFN: null,
     };
 
     // check node or browser
@@ -575,6 +576,16 @@ var req = (function() {
 
         var fn = (NODE) ? _httpRequest : _xhrRequest;
         var p = (config.promise === true || settings.ASYNC === 'promise');
+
+        const always = config.always;
+        config.always = function (result, response, config) {
+            if (typeof settings.LOGFN === 'function') {
+                settings.LOGFN(result, config);
+            }
+            if (typeof always === 'function') {
+                always(result, response, config);
+            }
+        };
 
         if (p) {
             return new settings.Promise(function(resolve, reject) {
