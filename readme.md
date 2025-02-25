@@ -1,15 +1,19 @@
 # lxRequest
 
-A lightwight (ES3 compatible) http request library. Transparent and *dependency free* requests via XMLHttpRequest (XHR) or node HTTP module.
+A lightwight http request library. Transparent and *dependency free* requests via XMLHttpRequest (XHR) or node HTTP module.
 
-- node or browser requests
-- zero dependencies
-- promise or callback mode
-- small and extendable
-- configurable, globally or per request
-- transparent, great for testing
-- presets
-- [xAPI](https://github.com/adlnet/xAPI-Spec/blob/master/xAPI.md) requests and xAPI statement aggregation
+- Zero dependencies: no package hell <sup>1</sup>
+- Runs in Node.js or browser
+- Written in **ES3**: runs on legacy node and browser versions (e.g. IE6, node v4.9.1)
+- [xAPI](https://github.com/adlnet/xAPI-Spec/blob/master/xAPI.md) conform requests and xAPI statement aggregation
+- Promise or callback mode
+- Small and extendable
+- Configurable: globally or per request
+- Transparent: great for testing
+- Presets: preconfigured requests
+
+
+<sup>1)</sup> except `devDependencies`
 
 # Contents
 
@@ -126,10 +130,10 @@ req.delete('<string:url>', <object:options>);
 by content type
 
 ```javascript
-req.json('<string:url>', <object:options>); // application/json
-req.form('<string:url>', <object:options>); // application/x-www-form-urlencoded
+req.json('<string:url>', <object:options>);  // application/json
+req.form('<string:url>', <object:options>);  // application/x-www-form-urlencoded
 req.plain('<string:url>', <object:options>); // text/plain
-req.raw('<string:url>', <object:options>); // no content type, alias of req.request()
+req.raw('<string:url>', <object:options>);   // no content type, alias of req.request()
 ```
 
 ## Request options<a name="req-options"></a>
@@ -153,6 +157,8 @@ var defaults = {
 
 Global configuration allows you to change the behaviour for all requests
 
+### `ASYNC`
+
 `req.ASYNC`: set callback or promise mode for all request: either '`callback`' (default) or `'promise'`
 
 ```javascript
@@ -165,6 +171,21 @@ req.get(<uri>).then(() => {
 ```
 
 `req.Promise`: optional ES6 Promise shim/substitute
+
+### LOGFN
+
+`req.LOGFN`: sets global callback function for logging of requests
+
+```javascript
+var ticks = 0;
+req.LOGFN = function(response, config) {
+    tick++;
+    console.log(tick, JSON.stringify({response, config}));
+};
+
+req.get(<uri-1>).then(() => console.assert(tick === 1, 'increment'));
+req.get(<uri-2>).then(() => console.assert(tick === 2, 'increment'));
+```
 
 ## Response object<a name="req-response"></a>
 
