@@ -36,24 +36,6 @@ describe('req.LOGFN', function() {
         done();
     });
 
-    it('should call LOGFN (callback)', function(done) {
-        let tick = 0;
-
-        req.LOGFN = function(res, conf) {
-            tick += 1;
-        };
-
-        req.request(url + '/200', {
-            success: function(result, response) {
-                assert.strictEqual(result.status, 200);
-            },
-            always: function(result, response) {
-                assert.strictEqual(tick, 1, 'LOGFN has been called');
-                done();
-            }
-        });
-    });
-
     it('should call LOGFN (promise)', function() {
         let tick = 0;
 
@@ -61,45 +43,45 @@ describe('req.LOGFN', function() {
             tick += 1;
         };
 
-        return req.request(url + '/200', {
-            promise: true
+        // extras.always is being called after config.always, so we can't use callbackes easily in order to count ticks
+        return req.request(url + '/200', { promise: true })
+        .then(function(result) {
+            assert.strictEqual(tick, 1, 'LOGFN has been called');
+            return req.request(url + '/200', { promise: true });
         })
         .then(function(result) {
-            assert.strictEqual(result.status, 200);
-            assert.strictEqual(tick, 1, 'LOGFN has been called');
+            assert.strictEqual(tick, 2, 'LOGFN has been called');
+            return req.request(url + '/200', { promise: true });
+        })
+        .then(function(result) {
+            assert.strictEqual(tick, 3, 'LOGFN has been called')
+            return true;
         })
         ;
     });
 
-    it('should call LOGFN on error', function(done) {
+    it('should call LOGFN on error', function() {
         let tick = 0;
 
         req.LOGFN = function(res, conf) {
             tick += 1;
         };
 
-        const trigger = {
-            success: 0,
-            error: 0,
-            always: 0
-        };
-        req.request(url + '/400?dsa', {
-            method: 'GET',
-            success: function(result, response) {
-                trigger.success++;
-            },
-            error: function(result, response) {
-                trigger.error++;
-            },
-            always: function(result, response) {
-                assert.strictEqual(result.status, 400);
-                assert.strictEqual(trigger.success, 0);
-                assert.strictEqual(trigger.error, 1);
-
-                assert.strictEqual(tick, 1, 'LOGFN has been called');
-                done();
-            }
-        });
+        // extras.always is being called after config.always, so we can't use callbackes easily in order to count ticks
+        return req.request(url + '/400', { promise: true })
+        .catch(function(result) {
+            assert.strictEqual(tick, 1, 'LOGFN has been called');
+            return req.request(url + '/400', { promise: true });
+        })
+        .catch(function(result) {
+            assert.strictEqual(tick, 2, 'LOGFN has been called');
+            return req.request(url + '/400', { promise: true });
+        })
+        .catch(function(result) {
+            assert.strictEqual(tick, 3, 'LOGFN has been called')
+            return true;
+        })
+        ;
     });
 
 });

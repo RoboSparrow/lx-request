@@ -9,7 +9,7 @@ var req = (function() {
 
     var settings = {
         ASYNC: 'callback',
-        LOGFN: null,
+        LOGFN: null
     };
 
     // check node or browser
@@ -311,7 +311,7 @@ var req = (function() {
     ////
 
     // XHR request
-    var _xhrRequest = function(url, config) {
+    var _xhrRequest = function(url, config, extras) {
 
         var xhr = new XMLHttpRequest();
         xhr.open(config.method, url, true);// TODO catch exception (legacy IE CORS throws exception and does not trigger onerror)
@@ -347,6 +347,7 @@ var req = (function() {
                     config.error(result, xhr);
                 }
                 config.always(result, xhr, config);
+                extras.always(result, xhr, config);
             }
         };
 
@@ -358,6 +359,7 @@ var req = (function() {
 
             config.error(result, request);
             config.always(result, error, config);
+            extras.always(result, error, config);
         };
 
         var data = null;
@@ -375,7 +377,7 @@ var req = (function() {
     };
 
     /// node/http
-    var _httpRequest = function(url, config) {
+    var _httpRequest = function(url, config, extras) {
 
         var _url =  Url.parse(url);
         var module = (_url.protocol === 'https:') ? https : http;
@@ -427,6 +429,7 @@ var req = (function() {
                     config.error(result, res);
                 }
                 config.always(result, res, config);
+                extras.always(result, res, config);
             });
 
         });
@@ -442,6 +445,7 @@ var req = (function() {
 
             config.error(result, request);
             config.always(result, error, config);
+            extras.always(result, error, config);
         });
 
         request.end();
@@ -577,13 +581,13 @@ var req = (function() {
         var fn = (NODE) ? _httpRequest : _xhrRequest;
         var p = (config.promise === true || settings.ASYNC === 'promise');
 
-        const always = config.always;
-        config.always = function (result, response, config) {
-            if (typeof settings.LOGFN === 'function') {
-                settings.LOGFN(result, config);
-            }
-            if (typeof always === 'function') {
-                always(result, response, config);
+        // protected configuration
+        const extras = {
+            always: function(result, response, config) {
+                if (typeof settings.LOGFN === 'function') {
+                    // eslint-disable-next-line new-cap
+                    settings.LOGFN(result, config);
+                }
             }
         };
 
@@ -595,11 +599,11 @@ var req = (function() {
                 config.error = function(data) {
                     reject(data);
                 };
-                fn(url, config);
+                fn(url, config, extras);
             });
         }
 
-        return fn(url, config);
+        return fn(url, config, extras);
     };
 
     ////
