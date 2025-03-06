@@ -1,6 +1,6 @@
 # lxRequest
 
-A lightwight http request library. Transparent and *dependency free* requests via XMLHttpRequest (XHR) or node HTTP module.
+A lightweight http request library. Transparent and *dependency free* requests via XMLHttpRequest (XHR) or node HTTP module.
 
 - Zero dependencies: no package hell <sup>1</sup>
 - Runs in Node.js or browser
@@ -11,7 +11,6 @@ A lightwight http request library. Transparent and *dependency free* requests vi
 - Configurable: globally or per request
 - Transparent: great for testing
 - Presets: preconfigured requests
-
 
 <sup>1)</sup> except `devDependencies`
 
